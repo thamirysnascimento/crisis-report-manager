@@ -5,348 +5,116 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crisis Report Manager — MELI OPS</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
-
-  :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --surface2: #181c24;
-    --border: #252a35;
-    --accent: #ff5c28;
-    --accent2: #ffb800;
-    --green: #22d78a;
-    --blue: #3b82f6;
-    --text: #e8eaf0;
-    --text2: #8891a5;
-    --red: #ff3b5c;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Sora', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo-badge {
-    background: var(--accent);
-    color: white;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 9px;
-    border-radius: 4px;
-    letter-spacing: 1px;
-  }
-  .header-title { font-size: 14px; font-weight: 600; color: var(--text2); }
-
-  .live-badge {
-    display: flex; align-items: center; gap: 6px;
-    background: rgba(255,60,40,0.12);
-    border: 1px solid rgba(255,60,40,0.3);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 1px;
-  }
-  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    padding: 0 28px;
-  }
-  .tab {
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text2);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab:hover:not(.active) { color: var(--text); }
-
-  .main { padding: 24px 28px; max-width: 900px; margin: 0 auto; }
-
-  .page { display: none; }
-  .page.active { display: block; }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-  .form-grid.full { grid-template-columns: 1fr; }
-
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .field input, .field select, .field textarea {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: 'Sora', sans-serif;
-    font-size: 13px;
-    padding: 10px 12px;
-    transition: border 0.2s;
-    outline: none;
-    resize: none;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
-  .field select option { background: var(--surface2); }
-
-  .relevance-group { display: flex; gap: 8px; }
-  .rel-btn {
-    flex: 1;
-    padding: 9px 8px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    font-family: 'Sora', sans-serif;
-  }
-  .rel-btn.selected-alta { background: rgba(255,60,40,0.15); border-color: var(--red); color: var(--red); }
-  .rel-btn.selected-media { background: rgba(255,184,0,0.15); border-color: var(--accent2); color: var(--accent2); }
-  .rel-btn.selected-baixa { background: rgba(34,215,138,0.15); border-color: var(--green); color: var(--green); }
-
-  .actions-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-  .action-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 12px;
-  }
-  .action-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    font-weight: 700;
-    min-width: 20px;
-  }
-  .action-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 13px;
-    outline: none;
-    font-family: 'Sora', sans-serif;
-  }
-  .action-input::placeholder { color: var(--text2); }
-  .remove-btn {
-    background: none;
-    border: none;
-    color: var(--text2);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0 2px;
-    transition: color 0.2s;
-  }
-  .remove-btn:hover { color: var(--red); }
-
-  .add-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: none;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    color: var(--text2);
-    font-size: 13px;
-    padding: 9px 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Sora', sans-serif;
-    width: 100%;
-  }
-  .add-action-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'JetBrains Mono', monospace;
-    margin: 20px 0 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-  .btn {
-    padding: 11px 22px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    font-family: 'Sora', sans-serif;
-    transition: all 0.18s;
-  }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: #ff6e40; }
-  .btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
-  .btn-secondary:hover { color: var(--text); }
-  .btn-green { background: var(--green); color: #0a0c10; }
-  .btn-green:hover { background: #30e898; }
-
-  .preview-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    line-height: 1.8;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-    min-height: 120px;
-    position: relative;
-  }
-  .copy-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Sora', sans-serif;
-    font-weight: 600;
-    transition: all 0.2s;
-  }
-  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .copy-btn.copied { color: var(--green); border-color: var(--green); }
-
-  .log-empty {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--text2);
-    font-size: 13px;
-  }
-  .log-empty span { display: block; font-size: 32px; margin-bottom: 10px; }
-
-  .crisis-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .crisis-card:hover { border-color: var(--accent); }
-  .crisis-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
-  .crisis-title { font-weight: 700; font-size: 14px; }
-  .crisis-meta { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
-  .crisis-desc { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
-
-  .badge {
-    font-size: 10px;
-    font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .badge-alta { background: rgba(255,60,40,0.15); color: var(--red); }
-  .badge-media { background: rgba(255,184,0,0.15); color: var(--accent2); }
-  .badge-baixa { background: rgba(34,215,138,0.15); color: var(--green); }
-
-  .timer-bar {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .timer-label { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
-  .timer-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
-  .timer-controls { display: flex; gap: 8px; }
-  .timer-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: 'Sora', sans-serif; transition: all 0.2s; }
-  .timer-btn.active { background: rgba(255,60,40,0.1); border-color: var(--accent); color: var(--accent); }
-
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    max-width: 600px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-  }
-  .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; }
-  .modal h3 { font-size: 15px; margin-bottom: 16px; padding-right: 30px; }
-
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+:root{--bg:#0a0c10;--surface:#111318;--surface2:#181c24;--border:#252a35;--accent:#ff5c28;--accent2:#ffb800;--green:#22d78a;--blue:#3b82f6;--text:#e8eaf0;--text2:#8891a5;--red:#ff3b5c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo-badge{background:var(--accent);color:white;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 9px;border-radius:4px;letter-spacing:1px;}
+.header-title{font-size:14px;font-weight:600;color:var(--text2);}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(255,60,40,0.12);border:1px solid rgba(255,60,40,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 28px;overflow-x:auto;}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+.main{padding:24px 28px;max-width:920px;margin:0 auto;}
+.page{display:none;}.page.active{display:block;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-grid.full{grid-template-columns:1fr;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:13px;padding:10px 12px;transition:border 0.2s;outline:none;resize:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field select option{background:var(--surface2);}
+.relevance-group{display:flex;gap:8px;}
+.rel-btn{flex:1;padding:9px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Sora',sans-serif;}
+.rel-btn.selected-alta{background:rgba(255,60,40,0.15);border-color:var(--red);color:var(--red);}
+.rel-btn.selected-media{background:rgba(255,184,0,0.15);border-color:var(--accent2);color:var(--accent2);}
+.rel-btn.selected-baixa{background:rgba(34,215,138,0.15);border-color:var(--green);color:var(--green);}
+.actions-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.action-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+.action-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;min-width:20px;}
+.action-input{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;font-family:'Sora',sans-serif;}
+.action-input::placeholder{color:var(--text2);}
+.remove-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0 2px;transition:color 0.2s;}
+.remove-btn:hover{color:var(--red);}
+.add-action-btn{display:flex;align-items:center;gap:8px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--text2);font-size:13px;padding:9px 14px;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif;width:100%;}
+.add-action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.btn{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Sora',sans-serif;transition:all 0.18s;}
+.btn-primary{background:var(--accent);color:white;}.btn-primary:hover{background:#ff6e40;}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}.btn-secondary:hover{color:var(--text);}
+.btn-green{background:var(--green);color:#0a0c10;}.btn-green:hover{background:#30e898;}
+.preview-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:80px;position:relative;}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;transition:all 0.2s;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-btn.copied{color:var(--green);border-color:var(--green);}
+.timer-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.timer-section{display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.timer-label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+.timer-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--accent);}
+.countdown-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--green);}
+.countdown-value.warning{color:var(--accent2);}
+.countdown-value.urgent{color:var(--red);animation:blink 0.5s infinite;}
+.timer-controls{display:flex;gap:8px;flex-wrap:wrap;}
+.timer-btn{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.2s;}
+.timer-btn.active{background:rgba(255,60,40,0.1);border-color:var(--accent);color:var(--accent);}
+.alert-banner{display:none;background:rgba(255,184,0,0.15);border:1px solid var(--accent2);border-radius:10px;padding:12px 18px;margin-bottom:14px;font-size:13px;font-weight:600;color:var(--accent2);text-align:center;}
+.alert-banner.show{display:block;animation:pulse 1s infinite;}
+.alert-banner.urgent-alert{background:rgba(255,60,40,0.15);border-color:var(--red);color:var(--red);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.link-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.link-card-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.link-card-sub{font-size:11px;color:var(--text2);}
+.link-card a{background:var(--blue);color:white;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background 0.2s;}
+.link-card a:hover{background:#5599ff;}
+.event-badge{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#7ab4ff;}
+.acr-section{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
+.acr-section-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.acr-section-num{background:var(--accent);color:white;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.checklist-item:last-child{border-bottom:none;}
+.check-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:4px 8px;font-family:'Sora',sans-serif;outline:none;min-width:100px;flex-shrink:0;}
+.check-label{flex:0 0 200px;}
+.check-title{font-size:12px;font-weight:600;margin-bottom:2px;}
+.check-desc{font-size:11px;color:var(--text2);line-height:1.4;}
+.check-obs{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;font-family:'Sora',sans-serif;outline:none;resize:none;}
+.why-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
+.why-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;padding:8px 10px;font-family:'Sora',sans-serif;outline:none;resize:none;width:100%;}
+.why-label{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.log-empty{text-align:center;padding:48px 20px;color:var(--text2);font-size:13px;}
+.log-empty span{display:block;font-size:32px;margin-bottom:10px;}
+.crisis-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:border-color 0.2s;}
+.crisis-card:hover{border-color:var(--accent);}
+.crisis-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:10px;}
+.crisis-title{font-weight:700;font-size:14px;}
+.crisis-meta{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+.crisis-desc{font-size:12.5px;color:var(--text2);line-height:1.5;}
+.badge{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;}
+.badge-alta{background:rgba(255,60,40,0.15);color:var(--red);}
+.badge-media{background:rgba(255,184,0,0.15);color:var(--accent2);}
+.badge-baixa{background:rgba(34,215,138,0.15);color:var(--green);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:650px;width:100%;max-height:85vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;}
+.modal h3{font-size:15px;margin-bottom:16px;padding-right:30px;}
+.modal-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.modal-tab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Sora',sans-serif;transition:all 0.2s;}
+.modal-tab.active{background:rgba(255,92,40,0.15);border-color:var(--accent);color:var(--accent);}
+.modal-page{display:none;}.modal-page.active{display:block;}
+.preview-label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.form-grid,.form-grid.three{grid-template-columns:1fr;}.why-row{grid-template-columns:1fr 1fr;}.check-label{flex:0 0 140px;}}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-left">
     <div class="logo-badge">MELI OPS</div>
@@ -354,347 +122,527 @@
   </div>
   <div class="live-badge"><div class="live-dot"></div>LIVE</div>
 </div>
-
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('form')">📋 Novo Report</div>
-  <div class="tab" onclick="switchTab('preview')">👁 Preview</div>
+  <div class="tab active" onclick="switchTab('form')">📋 Report</div>
+  <div class="tab" onclick="switchTab('flash')">⚡ Flash Report</div>
+  <div class="tab" onclick="switchTab('acr')">🔍 ACR</div>
   <div class="tab" onclick="switchTab('log')">📁 Histórico</div>
 </div>
-
 <div class="main">
 
-  <!-- FORM -->
-  <div class="page active" id="tab-form">
+<!-- ===== REPORT ===== -->
+<div class="page active" id="tab-form">
+  <div class="alert-banner" id="alert-banner">⚠️ Hora de enviar atualização! Já se passaram 25 minutos.</div>
+  <div class="timer-bar">
+    <div class="timer-section">
+      <div><div class="timer-label">⏱ Duração da Crise</div><div class="timer-value" id="timer-display">00:00:00</div></div>
+      <div><div class="timer-label">🔔 Próx. Update em</div><div class="countdown-value" id="countdown-display">25:00</div></div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn" id="timer-start-btn" onclick="toggleTimer()">▶ Iniciar</button>
+      <button class="timer-btn" onclick="resetCountdown()">↺ Reset 25min</button>
+      <button class="timer-btn" onclick="resetAll()">⏹ Zerar Tudo</button>
+    </div>
+  </div>
+  <div class="section-label">Identificação</div>
+  <div class="form-grid">
+    <div class="field"><label>Local / CD</label><input type="text" id="local" placeholder="Ex: BRXSP10 - SORTER" oninput="syncFields()"></div>
+    <div class="field"><label>Equipamento / Esteira</label><input type="text" id="equipamento" placeholder="Ex: B080" oninput="syncFields()"></div>
+    <div class="field"><label>Data</label><input type="date" id="data" oninput="syncFields()"></div>
+    <div class="field"><label>Início do Impacto</label><input type="time" id="inicio" oninput="syncFields()"></div>
+  </div>
+  <div class="section-label">Impacto</div>
+  <div class="form-grid full">
+    <div class="field"><label>Descrição do Impacto</label><input type="text" id="impacto" placeholder="Ex: Parada da esteira B080" oninput="syncFields()"></div>
+  </div>
+  <div class="field" style="margin-bottom:14px">
+    <label>Relevância</label>
+    <div class="relevance-group">
+      <button class="rel-btn" onclick="selectRel('Alta')" id="rel-Alta">🔴 Alta</button>
+      <button class="rel-btn" onclick="selectRel('Media')" id="rel-Media">🟡 Média</button>
+      <button class="rel-btn" onclick="selectRel('Baixa')" id="rel-Baixa">🟢 Baixa</button>
+    </div>
+  </div>
+  <div class="section-label">Descrição &amp; Causa</div>
+  <div class="form-grid full">
+    <div class="field"><label>Descrição da Ocorrência</label><textarea id="descricao" rows="3" placeholder="Descreva o que está acontecendo..." oninput="syncFields()"></textarea></div>
+    <div class="field"><label>Causa Identificada</label><input type="text" id="causa" placeholder="Em análise / descreva a causa..." oninput="syncFields()"></div>
+  </div>
+  <div class="section-label">Ações Realizadas</div>
+  <div class="actions-list" id="actions-list"></div>
+  <button class="add-action-btn" onclick="addAction()">+ Adicionar Ação</button>
+  <div class="section-label">Focal Points &amp; Status</div>
+  <div class="form-grid">
+    <div class="field"><label>Responsáveis</label><input type="text" id="focal" placeholder="Ex: Nicollas / Saul" oninput="syncFields()"></div>
+    <div class="field"><label>Status Atual</label>
+      <select id="status" onchange="syncFields()">
+        <option value="Em andamento">🔴 Em andamento</option>
+        <option value="Em análise">🟡 Em análise</option>
+        <option value="Em teste">🔵 Em teste</option>
+        <option value="Resolvido">🟢 Resolvido</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-label">Preview do Report</div>
+  <div class="preview-box">
+    <button class="copy-btn" id="cp-report" onclick="copyEl('cp-report','preview-report')">📋 Copiar</button>
+    <span id="preview-report" style="display:block;margin-top:4px"></span>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-green" onclick="saveReport(event)">💾 Salvar no Histórico</button>
+    <button class="btn btn-secondary" onclick="clearForm()">🗑 Limpar</button>
+  </div>
+</div>
 
-    <div class="timer-bar">
-      <div>
-        <div class="timer-label">⏱ Duração da Crise</div>
-        <div class="timer-value" id="timer-display">00:00:00</div>
-      </div>
-      <div class="timer-controls">
-        <button class="timer-btn" id="timer-start-btn" onclick="toggleTimer()">▶ Iniciar</button>
-        <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+<!-- ===== FLASH REPORT ===== -->
+<div class="page" id="tab-flash">
+  <div class="link-card">
+    <div><div class="link-card-title">⚡ Google Forms — Flash Report</div><div class="link-card-sub">Gere o texto abaixo e cole no Forms</div></div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeOLfteUqrNMD2gVyqEr5DwpmJrTcL-t7FCuVeJUX5fz7t0Jg/viewform" target="_blank">📝 Abrir Forms</a>
+  </div>
+  <div class="event-badge">🔗 Evento vinculado: <strong id="flash-evento-label">Nenhum — preencha o Report primeiro</strong></div>
+  <div class="section-label">Campos Específicos do Flash</div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Local, equipamento, data e hora já sincronizam do Report automaticamente.</p>
+  <div class="form-grid three">
+    <div class="field"><label>Site / Regional</label><input type="text" id="flash-site" placeholder="Ex: GRUII" oninput="updateFlashPreview()"></div>
+    <div class="field"><label>Área</label><input type="text" id="flash-area" placeholder="Ex: INHUB, SORTER" oninput="updateFlashPreview()"></div>
+    <div class="field"><label>Full ou UTR</label>
+      <select id="flash-tipo" onchange="updateFlashPreview()"><option value="UTR">UTR</option><option value="FULL">FULL</option></select>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="field"><label>Hora Fim</label><input type="time" id="flash-fim" oninput="updateFlashPreview()"></div>
+    <div class="field"><label>Impacto Operacional?</label>
+      <select id="flash-impacto-op" onchange="updateFlashPreview()"><option value="Não">Não</option><option value="Sim">Sim</option></select>
+    </div>
+  </div>
+  <div class="form-grid full">
+    <div class="field"><label>Identificação da Falha</label><textarea id="flash-identificacao" rows="2" placeholder="Como a falha foi identificada..." oninput="updateFlashPreview()"></textarea></div>
+    <div class="field"><label>Próximos Passos</label><textarea id="flash-proximos" rows="2" placeholder="Ex: Troca de componentes, verificação com operação..." oninput="updateFlashPreview()"></textarea></div>
+    <div class="field"><label>Link de Imagens</label><input type="text" id="flash-imagens" placeholder="Link do drive com fotos..." oninput="updateFlashPreview()"></div>
+  </div>
+  <div class="section-label">Textos para Copiar no Forms</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div>
+      <div class="preview-label">Falla / Defecto + Impacto</div>
+      <div class="preview-box" style="min-height:60px">
+        <button class="copy-btn" id="cp-f1" onclick="copyEl('cp-f1','pf-impacto')">📋 Copiar</button>
+        <span id="pf-impacto" style="display:block;margin-top:4px;font-size:12px"></span>
       </div>
     </div>
+    <div>
+      <div class="preview-label">Linha do Tempo / Ações Realizadas</div>
+      <div class="preview-box" style="min-height:80px">
+        <button class="copy-btn" id="cp-f2" onclick="copyEl('cp-f2','pf-acoes')">📋 Copiar</button>
+        <span id="pf-acoes" style="display:block;margin-top:4px;font-size:12px"></span>
+      </div>
+    </div>
+    <div>
+      <div class="preview-label">Próximos Passos</div>
+      <div class="preview-box" style="min-height:50px">
+        <button class="copy-btn" id="cp-f3" onclick="copyEl('cp-f3','pf-proximos')">📋 Copiar</button>
+        <span id="pf-proximos" style="display:block;margin-top:4px;font-size:12px"></span>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <div class="section-label">Identificação</div>
+<!-- ===== ACR ===== -->
+<div class="page" id="tab-acr">
+  <div class="link-card">
+    <div><div class="link-card-title">🔍 Guia Padrão ACR — v2.0 Abril 2025</div><div class="link-card-sub">Preencha abaixo e copie para o documento oficial</div></div>
+    <a href="https://drive.google.com/drive/folders/" target="_blank" id="acr-link-btn">📄 Abrir ACR</a>
+  </div>
+  <div class="event-badge">🔗 Evento vinculado: <strong id="acr-evento-label">Nenhum — preencha o Report primeiro</strong></div>
+
+  <div class="acr-section">
+    <div class="acr-section-title"><span class="acr-section-num">S1</span> 6W + 2H — Definição do Problema</div>
     <div class="form-grid">
-      <div class="field">
-        <label>Local / CD</label>
-        <input type="text" id="local" placeholder="Ex: BRXSP10 - SORTER" oninput="updatePreview()">
-      </div>
-      <div class="field">
-        <label>Equipamento / Esteira</label>
-        <input type="text" id="equipamento" placeholder="Ex: B080" oninput="updatePreview()">
-      </div>
-      <div class="field">
-        <label>Data</label>
-        <input type="date" id="data" oninput="updatePreview()">
-      </div>
-      <div class="field">
-        <label>Início do Impacto</label>
-        <input type="time" id="inicio" oninput="updatePreview()">
-      </div>
-    </div>
-
-    <div class="section-label">Impacto</div>
-    <div class="form-grid full">
-      <div class="field">
-        <label>Descrição do Impacto</label>
-        <input type="text" id="impacto" placeholder="Ex: Parada da esteira B080" oninput="updatePreview()">
-      </div>
-    </div>
-
-    <div class="field" style="margin-bottom:14px">
-      <label>Relevância</label>
-      <div class="relevance-group">
-        <button class="rel-btn" onclick="selectRel('Alta')" id="rel-Alta">🔴 Alta</button>
-        <button class="rel-btn" onclick="selectRel('Media')" id="rel-Media">🟡 Média</button>
-        <button class="rel-btn" onclick="selectRel('Baixa')" id="rel-Baixa">🟢 Baixa</button>
-      </div>
-    </div>
-
-    <div class="section-label">Descrição & Causa</div>
-    <div class="form-grid full">
-      <div class="field">
-        <label>Descrição da Ocorrência</label>
-        <textarea id="descricao" rows="3" placeholder="Descreva o que está acontecendo..." oninput="updatePreview()"></textarea>
-      </div>
-      <div class="field">
-        <label>Causa Identificada</label>
-        <input type="text" id="causa" placeholder="Em análise / descreva a causa..." oninput="updatePreview()">
-      </div>
-    </div>
-
-    <div class="section-label">Ações Realizadas</div>
-    <div class="actions-list" id="actions-list"></div>
-    <button class="add-action-btn" onclick="addAction()">+ Adicionar Ação</button>
-
-    <div class="section-label">Focal Points & Status</div>
-    <div class="form-grid">
-      <div class="field">
-        <label>Responsáveis</label>
-        <input type="text" id="focal" placeholder="Ex: Nicollas / Saul" oninput="updatePreview()">
-      </div>
-      <div class="field">
-        <label>Status Atual</label>
-        <select id="status" onchange="updatePreview()">
-          <option value="Em andamento">🔴 Em andamento</option>
-          <option value="Em análise">🟡 Em análise</option>
-          <option value="Em teste">🔵 Em teste</option>
-          <option value="Resolvido">🟢 Resolvido</option>
+      <div class="field"><label>1) What — O QUÊ?</label><textarea id="acr-what" rows="3" placeholder="Qual a falha? Quantifica a perda (tempo de afetação)..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>2) Where — ONDE?</label><textarea id="acr-where" rows="3" placeholder="Onde ocorreu? Local, equipamento, componente..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>3) When — QUANDO?</label>
+        <select id="acr-when-tipo" onchange="updateAcrPreview()" style="margin-bottom:6px">
+          <option value="">Selecione o momento...</option>
+          <option>Arranque de turno</option><option>Durante o turno</option><option>Fim de turno</option>
+          <option>Durante mudança de turno</option><option>Após troca de componente</option>
+          <option>Após manutenção planejada</option><option>Outro</option>
         </select>
+        <textarea id="acr-when" rows="2" placeholder="Complemento..." oninput="updateAcrPreview()"></textarea>
       </div>
+      <div class="field"><label>4) Who — QUEM / Quanto?</label><textarea id="acr-who" rows="3" placeholder="Quem está afetado? KPI impactado? Equipe envolvida..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>5) How — COMO?</label><textarea id="acr-how" rows="3" placeholder="Como ocorre? Estado atual vs condição normal..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>6) How often — FREQUÊNCIA?</label><textarea id="acr-howoften" rows="3" placeholder="Com que frequência? Há repetibilidade?" oninput="updateAcrPreview()"></textarea></div>
     </div>
+    <div class="field" style="margin-top:8px"><label>Problema Focado</label><textarea id="acr-foco" rows="3" placeholder="Reescreva o problema de forma acotada após preencher 6W+2H..." oninput="updateAcrPreview()"></textarea></div>
+  </div>
 
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="goToPreview()">👁 Ver Preview & Copiar</button>
-      <button class="btn btn-green" onclick="saveReport(event)">💾 Salvar no Histórico</button>
-      <button class="btn btn-secondary" onclick="clearForm()">🗑 Limpar</button>
+  <div class="acr-section">
+    <div class="acr-section-title"><span class="acr-section-num">S2</span> Ishikawa — Condições Básicas</div>
+    <div id="ishikawa-list"></div>
+  </div>
+
+  <div class="acr-section">
+    <div class="acr-section-title"><span class="acr-section-num">S3</span> 5 Porquês + Contramedidas</div>
+    <div id="whys-list"></div>
+    <button class="add-action-btn" onclick="addWhy()" style="margin-top:8px">+ Adicionar linha</button>
+    <div class="field" style="margin-top:14px"><label>Causa Raiz Identificada</label><textarea id="acr-causa-raiz" rows="3" placeholder="Descreva a causa raiz e lições aprendidas..." oninput="updateAcrPreview()"></textarea></div>
+    <div class="form-grid" style="margin-top:10px">
+      <div class="field"><label>Elaborado por</label><input type="text" id="acr-elabora" placeholder="Nome do analista" oninput="updateAcrPreview()"></div>
+      <div class="field"><label>Aprovação</label><input type="text" id="acr-aprova" placeholder="Nome do líder" oninput="updateAcrPreview()"></div>
     </div>
   </div>
 
-  <!-- PREVIEW -->
-  <div class="page" id="tab-preview">
-    <div class="section-label">Report Gerado</div>
-    <div class="preview-box">
-      <button class="copy-btn" id="copy-btn" onclick="copyReport()">📋 Copiar</button>
-      <span id="preview-text" style="display:block;margin-top:4px"></span>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="copyReport()">📋 Copiar para Slack/WhatsApp</button>
-      <button class="btn btn-secondary" onclick="switchTab('form')">← Voltar ao Formulário</button>
-    </div>
+  <div class="section-label">Texto Completo Gerado</div>
+  <div class="preview-box">
+    <button class="copy-btn" id="cp-acr" onclick="copyEl('cp-acr','preview-acr-text')">📋 Copiar Tudo</button>
+    <span id="preview-acr-text" style="display:block;margin-top:4px;font-size:12px"></span>
   </div>
+</div>
 
-  <!-- LOG -->
-  <div class="page" id="tab-log">
-    <div class="section-label">Crises Registradas</div>
-    <div id="log-container"></div>
-  </div>
+<!-- ===== LOG ===== -->
+<div class="page" id="tab-log">
+  <div class="section-label">Crises Registradas</div>
+  <div id="log-container"></div>
+</div>
 
 </div>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <h3 id="modal-title">Detalhe da Crise</h3>
-    <div class="preview-box" style="position:relative">
-      <button class="copy-btn" onclick="copyModal()">📋 Copiar</button>
-      <span id="modal-text" style="display:block;margin-top:4px;font-size:12px"></span>
+    <h3 id="modal-title"></h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('report')">📋 Report</button>
+      <button class="modal-tab" onclick="switchModalTab('flash')">⚡ Flash</button>
+      <button class="modal-tab" onclick="switchModalTab('acr')">🔍 ACR</button>
+    </div>
+    <div class="modal-page active" id="modal-report">
+      <div class="preview-box"><button class="copy-btn" id="cp-mr" onclick="copyEl('cp-mr','modal-report-text')">📋 Copiar</button><span id="modal-report-text" style="display:block;margin-top:4px;font-size:12px;white-space:pre-wrap"></span></div>
+    </div>
+    <div class="modal-page" id="modal-flash">
+      <div class="preview-box"><button class="copy-btn" id="cp-mf" onclick="copyEl('cp-mf','modal-flash-text')">📋 Copiar</button><span id="modal-flash-text" style="display:block;margin-top:4px;font-size:12px;white-space:pre-wrap"></span></div>
+      <div style="margin-top:12px"><a href="https://docs.google.com/forms/d/e/1FAIpQLSeOLfteUqrNMD2gVyqEr5DwpmJrTcL-t7FCuVeJUX5fz7t0Jg/viewform" target="_blank" style="display:inline-block;background:var(--blue);color:white;padding:8px 18px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;">📝 Abrir Forms Flash Report</a></div>
+    </div>
+    <div class="modal-page" id="modal-acr">
+      <div class="preview-box"><button class="copy-btn" id="cp-ma" onclick="copyEl('cp-ma','modal-acr-text')">📋 Copiar</button><span id="modal-acr-text" style="display:block;margin-top:4px;font-size:12px;white-space:pre-wrap"></span></div>
     </div>
   </div>
 </div>
 
 <script>
-  let relevancia = '';
-  let actionCount = 0;
-  let timerInterval = null;
-  let timerSeconds = 0;
-  let timerRunning = false;
-  let savedReports = JSON.parse(localStorage.getItem('meli_crisis_reports') || '[]');
+var relevancia='',actionCount=0,whyCount=0,timerInterval=null,timerSeconds=0,countdownSeconds=1500,timerRunning=false;
+var savedReports=JSON.parse(localStorage.getItem('meli_crisis_v2')||'[]');
+var ISHIKAWA=[
+  {n:'1',t:'Limpeza',d:'Área livre de contaminação/poeira? Padrão de limpeza seguido?'},
+  {n:'2',t:'Inspeção',d:'Área livre de defeitos? (deformações, peças soltas, mal posicionadas)'},
+  {n:'3',t:'Lubrificação',d:'Tarefas de lubrificação realizadas? Lubrificante correto? Aquecimento/desgaste?'},
+  {n:'4',t:'Parâmetros do Equipamento',d:'Parâmetros de operação corretos? Peças conforme especificação técnica?'},
+  {n:'5',t:'Condições Ambientais',d:'Pressão, temperatura, umidade dentro das especificações?'},
+  {n:'6',t:'Condições Básicas de Operação',d:'Componentes ajustados corretamente seguindo padrão?'},
+  {n:'7',t:'Eletricidade',d:'Voltagem correta? Falsos contatos? Aterramento? Consumo elétrico/corrente?'},
+  {n:'8',t:'Planos de Manutenção',d:'Manutenção preventiva realizada? Todas as tarefas completadas? Técnico capacitado?'},
+  {n:'9',t:'Condições de Instalação',d:'Peças trocadas recentemente? Instalação conforme padrão (diagrama, desenho técnico)?'},
+  {n:'10',t:'Serviços Externos',d:'Trabalhos de fornecedores executados com qualidade requerida?'},
+  {n:'11',t:'Treinamentos',d:'Pessoal treinado conforme processo/procedimento vigente?'}
+];
 
-  // Init
-  document.getElementById('data').value = new Date().toISOString().split('T')[0];
-  const now = new Date();
-  document.getElementById('inicio').value = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-  addAction();
-  renderLog();
-  updatePreview();
+// INIT
+(function(){
+  var now=new Date();
+  document.getElementById('data').value=now.toISOString().split('T')[0];
+  var hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('inicio').value=hh+':'+mm;
+  addAction();buildIshikawa();addWhy();renderLog();syncFields();
+})();
 
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const tabs = ['form','preview','log'];
-    document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
-    document.getElementById('tab-'+tab).classList.add('active');
-    if(tab === 'preview') updatePreview();
-    if(tab === 'log') renderLog();
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var tabs=['form','flash','acr','log'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='log')renderLog();
+  if(tab==='flash'){syncFlashFromReport();updateFlashPreview();updateEventLabels();}
+  if(tab==='acr'){updateEventLabels();updateAcrPreview();}
+}
+
+function toggleTimer(){
+  var btn=document.getElementById('timer-start-btn');
+  if(!timerRunning){
+    timerInterval=setInterval(tick,1000);timerRunning=true;
+    btn.textContent='⏸ Pausar';btn.classList.add('active');
+  } else {
+    clearInterval(timerInterval);timerRunning=false;
+    btn.textContent='▶ Retomar';btn.classList.remove('active');
   }
+}
+function tick(){
+  timerSeconds++;countdownSeconds--;
+  updateTimerDisplay();updateCountdownDisplay();
+  if(countdownSeconds<=0){
+    document.getElementById('alert-banner').classList.add('show');
+    try{
+      var ctx=new(window.AudioContext||window.webkitAudioContext)();
+      [0,300,600].forEach(function(d){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.frequency.value=880;
+        g.gain.setValueAtTime(0.3,ctx.currentTime+d/1000);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d/1000+0.4);
+        o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+0.4);
+      });
+    }catch(e){}
+  } else if(countdownSeconds<=300){
+    document.getElementById('countdown-display').className='countdown-value urgent';
+  } else if(countdownSeconds<=600){
+    document.getElementById('countdown-display').className='countdown-value warning';
+  }
+}
+function updateTimerDisplay(){
+  var h=Math.floor(timerSeconds/3600),m=Math.floor((timerSeconds%3600)/60),s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function updateCountdownDisplay(){
+  var cs=Math.max(0,countdownSeconds);
+  var m=Math.floor(cs/60),s=cs%60;
+  document.getElementById('countdown-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function resetCountdown(){
+  countdownSeconds=1500;
+  document.getElementById('countdown-display').className='countdown-value';
+  document.getElementById('alert-banner').classList.remove('show');
+  updateCountdownDisplay();
+}
+function resetAll(){
+  clearInterval(timerInterval);timerRunning=false;timerSeconds=0;countdownSeconds=1500;
+  document.getElementById('timer-start-btn').textContent='▶ Iniciar';
+  document.getElementById('timer-start-btn').classList.remove('active');
+  document.getElementById('countdown-display').className='countdown-value';
+  document.getElementById('alert-banner').classList.remove('show');
+  updateTimerDisplay();updateCountdownDisplay();
+}
 
-  function toggleTimer() {
-    const btn = document.getElementById('timer-start-btn');
-    if(!timerRunning) {
-      timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000);
-      timerRunning = true;
-      btn.textContent = '⏸ Pausar';
-      btn.classList.add('active');
-    } else {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      btn.textContent = '▶ Retomar';
-      btn.classList.remove('active');
+function selectRel(val){
+  relevancia=val;
+  ['Alta','Media','Baixa'].forEach(function(r){document.getElementById('rel-'+r).className='rel-btn';});
+  var key=val==='Alta'?'alta':val==='Media'?'media':'baixa';
+  document.getElementById('rel-'+val).className='rel-btn selected-'+key;
+  syncFields();
+}
+
+function addAction(){
+  actionCount++;
+  var list=document.getElementById('actions-list'),div=document.createElement('div');
+  div.className='action-item';div.id='action-'+actionCount;
+  div.innerHTML='<span class="action-num">'+actionCount+'</span><input class="action-input" placeholder="Descreva a ação realizada..." oninput="syncFields()"><button class="remove-btn" onclick="removeAction('+actionCount+')">×</button>';
+  list.appendChild(div);
+}
+function removeAction(id){var el=document.getElementById('action-'+id);if(el)el.remove();renumberActions();syncFields();}
+function renumberActions(){document.querySelectorAll('.action-item').forEach(function(item,i){item.querySelector('.action-num').textContent=i+1;});}
+function getActions(){
+  var lines=[];
+  document.querySelectorAll('.action-input').forEach(function(inp,i){if(inp.value.trim())lines.push((i+1)+' - '+inp.value.trim());});
+  return lines.join('\n');
+}
+
+function buildReport(){
+  var local=document.getElementById('local').value||'[LOCAL]';
+  var data=document.getElementById('data').value;
+  var inicio=document.getElementById('inicio').value||'[HORA]';
+  var impacto=document.getElementById('impacto').value||'[IMPACTO]';
+  var rel=relevancia||'[RELEVÂNCIA]';
+  var desc=document.getElementById('descricao').value||'[DESCRIÇÃO]';
+  var causa=document.getElementById('causa').value||'Em análise';
+  var focal=document.getElementById('focal').value||'[FOCAL POINT]';
+  var status=document.getElementById('status').value;
+  var actions=getActions();
+  var cdCode=local.split(' - ')[0]||local;
+  var dateF=data?new Date(data+'T12:00:00').toLocaleDateString('pt-BR'):'[DATA]';
+  var r='📢🚨 ATUALIZAÇÃO DE CRISE - '+cdCode+' 📢🚨\nOcorrência:\nLocal: '+local+'\nImpacto: '+impacto+'\nRelevância: '+rel+'\nData: '+dateF+'   Início do Impacto: '+inicio+'\n\nDescrição da Ocorrência:\n'+desc+'\n\n';
+  if(actions)r+='Ações Realizadas:\n'+actions+'\n\n';
+  r+='Causa: '+causa+'\nFocal Point: '+focal+'\nStatus: '+status;
+  return r;
+}
+
+function syncFields(){
+  document.getElementById('preview-report').textContent=buildReport();
+  updateEventLabels();
+}
+
+function updateEventLabels(){
+  var local=document.getElementById('local').value;
+  var equip=document.getElementById('equipamento').value;
+  var label=(local||equip)?(local||'')+(equip?' — '+equip:''):'Nenhum — preencha o Report primeiro';
+  ['flash-evento-label','acr-evento-label'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=label;});
+}
+
+function syncFlashFromReport(){
+  var inicio=document.getElementById('inicio').value;
+  if(inicio)document.getElementById('flash-inicio')&&(document.getElementById('flash-inicio').value=inicio);
+  var desc=document.getElementById('descricao').value;
+  if(desc&&!document.getElementById('flash-identificacao').value)document.getElementById('flash-identificacao').value=desc;
+  var actions=getActions();
+  if(actions&&!document.getElementById('flash-imediato-hidden')){}
+}
+
+function updateFlashPreview(){
+  var equip=document.getElementById('equipamento').value||'[EQUIPAMENTO]';
+  var impacto=document.getElementById('impacto').value||'[IMPACTO]';
+  var local=document.getElementById('local').value||'[LOCAL]';
+  var data=document.getElementById('data').value;
+  var dateF=data?new Date(data+'T12:00:00').toLocaleDateString('pt-BR'):'[DATA]';
+  var inicio=document.getElementById('inicio').value||'--:--';
+  var fim=document.getElementById('flash-fim').value||'--:--';
+  var site=document.getElementById('flash-site').value||'';
+  var area=document.getElementById('flash-area').value||'';
+  var tipo=document.getElementById('flash-tipo').value;
+  var impOp=document.getElementById('flash-impacto-op').value;
+  var identificacao=document.getElementById('flash-identificacao').value||'';
+  var proximos=document.getElementById('flash-proximos').value||'';
+  var imagens=document.getElementById('flash-imagens').value||'';
+  var causa=document.getElementById('causa').value||'Em análise';
+  var focal=document.getElementById('focal').value||'';
+  var actions=getActions();
+  var tempoMs=(fim&&inicio)?calcTempo(inicio,fim):'';
+
+  document.getElementById('pf-impacto').textContent=
+    'Equipamento: '+equip+(tipo?' | '+tipo:'')+'\n'+
+    'Site/Regional: '+(site||local)+' | Área: '+(area||'')+'\n'+
+    'Data: '+dateF+' | Hora Início: '+inicio+(fim?' | Hora Fim: '+fim:'')+
+    (tempoMs?'\nTempo de Impacto: '+tempoMs:'')+'\n'+
+    'Impacto Operacional: '+impOp+'\n'+
+    'Impacto: '+impacto+'\nCausa: '+causa+(focal?'\nFocal Point: '+focal:'');
+
+  var acoesText='';
+  if(identificacao)acoesText+='Identificação da Falha:\n'+identificacao+'\n\n';
+  if(actions)acoesText+='Ações Realizadas:\n'+actions;
+  document.getElementById('pf-acoes').textContent=acoesText||'(preencha as ações no Report)';
+  document.getElementById('pf-proximos').textContent=(proximos||'(preencha acima)')+(imagens?'\n\nImagens: '+imagens:'');
+}
+
+function calcTempo(ini,fim){
+  var parts1=ini.split(':'),parts2=fim.split(':');
+  var mins=(parseInt(parts2[0])*60+parseInt(parts2[1]))-(parseInt(parts1[0])*60+parseInt(parts1[1]));
+  if(mins<0)mins+=1440;
+  return Math.floor(mins/60)+'h '+((mins%60)>0?(mins%60)+'min':'');
+}
+
+function buildIshikawa(){
+  document.getElementById('ishikawa-list').innerHTML=ISHIKAWA.map(function(item){
+    return '<div class="checklist-item">'+
+      '<div class="check-label"><div class="check-title">'+item.n+'. '+item.t+'</div><div class="check-desc">'+item.d+'</div></div>'+
+      '<select class="check-select" id="ishi-'+item.n+'" onchange="updateAcrPreview()"><option value="">—</option><option>✅ Conforme</option><option>❌ Não conforme</option><option>N/A</option></select>'+
+      '<textarea class="check-obs" id="ishi-obs-'+item.n+'" rows="2" placeholder="Observação..." oninput="updateAcrPreview()"></textarea>'+
+      '</div>';
+  }).join('');
+}
+
+function addWhy(){
+  whyCount++;
+  var list=document.getElementById('whys-list'),div=document.createElement('div');
+  div.id='why-'+whyCount;div.style.marginBottom='16px';
+  div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;color:var(--text2);font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.5px">Análise '+whyCount+'</span><button class="remove-btn" onclick="removeWhy('+whyCount+')">×</button></div>'+
+    '<div class="why-row">'+
+    '<div><div class="why-label">Causa Imediata</div><textarea class="why-input" id="why-ci-'+whyCount+'" rows="2" placeholder="O que ocorreu?" oninput="updateAcrPreview()"></textarea></div>'+
+    '<div><div class="why-label">Por quê? (1)</div><textarea class="why-input" id="why-1-'+whyCount+'" rows="2" placeholder="..." oninput="updateAcrPreview()"></textarea></div>'+
+    '<div><div class="why-label">Por quê? (2)</div><textarea class="why-input" id="why-2-'+whyCount+'" rows="2" placeholder="..." oninput="updateAcrPreview()"></textarea></div>'+
+    '<div><div class="why-label">Causa Raiz</div><textarea class="why-input" id="why-cr-'+whyCount+'" rows="2" placeholder="..." oninput="updateAcrPreview()"></textarea></div>'+
+    '</div>'+
+    '<div class="form-grid three" style="margin-top:6px">'+
+    '<div class="field"><label style="font-size:10px">Contramedida</label><input type="text" id="why-cm-'+whyCount+'" placeholder="Ação corretiva..." oninput="updateAcrPreview()"></div>'+
+    '<div class="field"><label style="font-size:10px">Responsável</label><input type="text" id="why-resp-'+whyCount+'" placeholder="Nome..." oninput="updateAcrPreview()"></div>'+
+    '<div class="field"><label style="font-size:10px">Data</label><input type="date" id="why-data-'+whyCount+'" oninput="updateAcrPreview()"></div>'+
+    '</div>';
+  list.appendChild(div);
+}
+function removeWhy(id){var el=document.getElementById('why-'+id);if(el)el.remove();updateAcrPreview();}
+
+function updateAcrPreview(){
+  var local=document.getElementById('local').value,equip=document.getElementById('equipamento').value,data=document.getElementById('data').value;
+  var t='=== ANÁLISE DE CAUSA RAIZ ===\n';
+  if(local||equip)t+='Evento: '+(local||'')+' '+(equip||'')+' | Data: '+(data||'')+'\n';
+  t+='\n--- SEÇÃO 1: 6W+2H ---\n';
+  var whenTipo=document.getElementById('acr-when-tipo').value;
+  [['O QUÊ?','acr-what'],['ONDE?','acr-where'],['QUANDO?'+(whenTipo?' ('+whenTipo+')':''),'acr-when'],['QUEM/QUANTO?','acr-who'],['COMO?','acr-how'],['FREQUÊNCIA?','acr-howoften']].forEach(function(f){
+    var v=document.getElementById(f[1])&&document.getElementById(f[1]).value;if(v)t+=f[0]+'\n'+v+'\n\n';
+  });
+  var foco=document.getElementById('acr-foco').value;if(foco)t+='PROBLEMA FOCADO:\n'+foco+'\n';
+  t+='\n--- SEÇÃO 2: ISHIKAWA ---\n';
+  ISHIKAWA.forEach(function(item){
+    var sel=document.getElementById('ishi-'+item.n),obs=document.getElementById('ishi-obs-'+item.n);
+    if(sel&&sel.value){t+=item.n+'. '+item.t+': '+sel.value;if(obs&&obs.value)t+=' — '+obs.value;t+='\n';}
+  });
+  t+='\n--- SEÇÃO 3: 5 PORQUÊS ---\n';
+  document.querySelectorAll('[id^="why-ci-"]').forEach(function(el){
+    var n=el.id.replace('why-ci-','');
+    var ci=el.value,w1=(document.getElementById('why-1-'+n)||{}).value||'',w2=(document.getElementById('why-2-'+n)||{}).value||'',cr=(document.getElementById('why-cr-'+n)||{}).value||'',cm=(document.getElementById('why-cm-'+n)||{}).value||'',resp=(document.getElementById('why-resp-'+n)||{}).value||'',dt=(document.getElementById('why-data-'+n)||{}).value||'';
+    if(ci||w1||cr){
+      t+='Análise '+n+':\n';
+      if(ci)t+='  Causa Imediata: '+ci+'\n';if(w1)t+='  Por quê (1): '+w1+'\n';if(w2)t+='  Por quê (2): '+w2+'\n';if(cr)t+='  Causa Raiz: '+cr+'\n';
+      if(cm)t+='  Contramedida: '+cm+(resp?' | Resp: '+resp:'')+(dt?' | Data: '+dt:'')+'\n';t+='\n';
     }
-  }
+  });
+  var causaRaiz=document.getElementById('acr-causa-raiz').value;if(causaRaiz)t+='CAUSA RAIZ FINAL:\n'+causaRaiz+'\n';
+  var elab=document.getElementById('acr-elabora').value,aprov=document.getElementById('acr-aprova').value;
+  if(elab||aprov)t+='\nElaborado por: '+(elab||'—')+'   Aprovação: '+(aprov||'—');
+  document.getElementById('preview-acr-text').textContent=t;
+}
 
-  function resetTimer() {
-    clearInterval(timerInterval);
-    timerRunning = false;
-    timerSeconds = 0;
-    updateTimerDisplay();
-    const btn = document.getElementById('timer-start-btn');
-    btn.textContent = '▶ Iniciar';
-    btn.classList.remove('active');
-  }
+function copyEl(btnId,spanId){
+  var text=document.getElementById(spanId).textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn=document.getElementById(btnId);if(!btn)return;
+    var orig=btn.textContent;btn.textContent='✅ Copiado!';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent=orig;btn.classList.remove('copied');},2000);
+  });
+}
 
-  function updateTimerDisplay() {
-    const h = String(Math.floor(timerSeconds/3600)).padStart(2,'0');
-    const m = String(Math.floor((timerSeconds%3600)/60)).padStart(2,'0');
-    const s = String(timerSeconds%60).padStart(2,'0');
-    document.getElementById('timer-display').textContent = h+':'+m+':'+s;
-  }
+function saveReport(e){
+  var report=buildReport();
+  var flashText=[document.getElementById('pf-impacto').textContent,document.getElementById('pf-acoes').textContent,document.getElementById('pf-proximos').textContent].join('\n\n');
+  var acrText=document.getElementById('preview-acr-text').textContent;
+  var local=document.getElementById('local').value||'Sem local',equip=document.getElementById('equipamento').value||'';
+  var status=document.getElementById('status').value,rel=relevancia||'N/A',createdAt=new Date().toLocaleString('pt-BR');
+  savedReports.unshift({id:Date.now(),local,equip,status,rel,report,flashText,acrText,createdAt});
+  localStorage.setItem('meli_crisis_v2',JSON.stringify(savedReports));
+  var btn=e.target,orig=btn.textContent;btn.textContent='✅ Salvo!';setTimeout(function(){btn.textContent=orig;},2000);
+}
 
-  function selectRel(val) {
-    relevancia = val;
-    ['Alta','Media','Baixa'].forEach(r => {
-      document.getElementById('rel-'+r).className = 'rel-btn';
-    });
-    const key = val === 'Alta' ? 'alta' : val === 'Media' ? 'media' : 'baixa';
-    document.getElementById('rel-'+val).className = 'rel-btn selected-'+key;
-    updatePreview();
-  }
+function renderLog(){
+  var c=document.getElementById('log-container');
+  if(!savedReports.length){c.innerHTML='<div class="log-empty"><span>📭</span>Nenhuma crise registrada ainda.</div>';return;}
+  c.innerHTML=savedReports.map(function(r){
+    var rk=(r.rel||'').toLowerCase().replace(/[éê]/g,'e');
+    return '<div class="crisis-card" onclick="openModal('+r.id+')">'+
+      '<div class="crisis-card-header"><div><div class="crisis-title">'+r.local+(r.equip?' — '+r.equip:'')+'</div><div class="crisis-meta">'+r.createdAt+'</div></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><span class="badge badge-'+rk+'">'+r.rel+'</span><span class="badge" style="background:var(--surface);color:var(--text2)">'+r.status+'</span></div></div>'+
+      '<div class="crisis-desc">'+r.report.substring(0,120)+'...</div></div>';
+  }).join('');
+}
 
-  function addAction() {
-    actionCount++;
-    const list = document.getElementById('actions-list');
-    const div = document.createElement('div');
-    div.className = 'action-item';
-    div.id = 'action-' + actionCount;
-    div.innerHTML = '<span class="action-num">' + actionCount + '</span><input class="action-input" placeholder="Descreva a ação realizada..." oninput="renumberActions(); updatePreview()"><button class="remove-btn" onclick="removeAction(' + actionCount + ')">×</button>';
-    list.appendChild(div);
-  }
-
-  function removeAction(id) {
-    const el = document.getElementById('action-' + id);
-    if(el) el.remove();
-    renumberActions();
-    updatePreview();
-  }
-
-  function renumberActions() {
-    document.querySelectorAll('.action-item').forEach((item, i) => {
-      item.querySelector('.action-num').textContent = (i+1);
-    });
-  }
-
-  function getActions() {
-    const lines = [];
-    document.querySelectorAll('.action-input').forEach((inp, i) => {
-      if(inp.value.trim()) lines.push((i+1) + ' - ' + inp.value.trim());
-    });
-    return lines.join('\n');
-  }
-
-  function buildReport() {
-    const local = document.getElementById('local').value || '[LOCAL]';
-    const data = document.getElementById('data').value;
-    const inicio = document.getElementById('inicio').value || '[HORA]';
-    const impacto = document.getElementById('impacto').value || '[IMPACTO]';
-    const rel = relevancia || '[RELEVÂNCIA]';
-    const desc = document.getElementById('descricao').value || '[DESCRIÇÃO]';
-    const causa = document.getElementById('causa').value || 'Em análise';
-    const focal = document.getElementById('focal').value || '[FOCAL POINT]';
-    const status = document.getElementById('status').value;
-    const actions = getActions();
-    const cdCode = local.split(' - ')[0] || local;
-    const dateFormatted = data ? new Date(data+'T12:00:00').toLocaleDateString('pt-BR') : '[DATA]';
-
-    let r = '📢🚨 ATUALIZAÇÃO DE CRISE - ' + cdCode + ' 📢🚨\n';
-    r += 'Ocorrência:\n';
-    r += 'Local: ' + local + '\n';
-    r += 'Impacto: ' + impacto + '\n';
-    r += 'Relevância: ' + rel + '\n';
-    r += 'Data: ' + dateFormatted + '   Início do Impacto: ' + inicio + '\n\n';
-    r += 'Descrição da Ocorrência:\n' + desc + '\n\n';
-    if(actions) r += 'Ações Realizadas:\n' + actions + '\n\n';
-    r += 'Causa: ' + causa + '\n';
-    r += 'Focal Point: ' + focal + '\n';
-    r += 'Status: ' + status;
-    return r;
-  }
-
-  function updatePreview() {
-    document.getElementById('preview-text').textContent = buildReport();
-  }
-
-  function goToPreview() {
-    updatePreview();
-    switchTab('preview');
-  }
-
-  function copyReport() {
-    navigator.clipboard.writeText(buildReport()).then(() => {
-      const btn = document.getElementById('copy-btn');
-      btn.textContent = '✅ Copiado!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '📋 Copiar'; btn.classList.remove('copied'); }, 2000);
-    });
-  }
-
-  function saveReport(e) {
-    const report = buildReport();
-    const local = document.getElementById('local').value || 'Sem local';
-    const equip = document.getElementById('equipamento').value || '';
-    const status = document.getElementById('status').value;
-    const rel = relevancia || 'N/A';
-    const createdAt = new Date().toLocaleString('pt-BR');
-    savedReports.unshift({ id: Date.now(), local, equip, status, rel, report, createdAt });
-    localStorage.setItem('meli_crisis_reports', JSON.stringify(savedReports));
-    const btn = e.target;
-    const original = btn.textContent;
-    btn.textContent = '✅ Salvo!';
-    setTimeout(() => { btn.textContent = original; }, 2000);
-  }
-
-  function renderLog() {
-    const c = document.getElementById('log-container');
-    if(!savedReports.length) {
-      c.innerHTML = '<div class="log-empty"><span>📭</span>Nenhuma crise registrada ainda.</div>';
-      return;
-    }
-    c.innerHTML = savedReports.map(r => {
-      const relKey = (r.rel || '').toLowerCase().replace('é','e');
-      return '<div class="crisis-card" onclick="openModal(' + r.id + ')">' +
-        '<div class="crisis-card-header">' +
-          '<div><div class="crisis-title">' + r.local + (r.equip ? ' — '+r.equip : '') + '</div>' +
-          '<div class="crisis-meta">' + r.createdAt + '</div></div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">' +
-            '<span class="badge badge-' + relKey + '">' + r.rel + '</span>' +
-            '<span class="badge" style="background:var(--surface);color:var(--text2)">' + r.status + '</span>' +
-          '</div></div>' +
-        '<div class="crisis-desc">' + r.report.substring(0,120) + '...</div>' +
-        '</div>';
-    }).join('');
-  }
-
-  function openModal(id) {
-    const r = savedReports.find(x => x.id === id);
-    if(!r) return;
-    document.getElementById('modal-title').textContent = r.local + (r.equip ? ' — '+r.equip : '') + '  ·  ' + r.createdAt;
-    document.getElementById('modal-text').textContent = r.report;
-    document.getElementById('detail-modal').classList.add('open');
-  }
-
-  function closeModal() {
-    document.getElementById('detail-modal').classList.remove('open');
-  }
-
-  function copyModal() {
-    navigator.clipboard.writeText(document.getElementById('modal-text').textContent);
-  }
-
-  function clearForm() {
-    if(!confirm('Limpar todos os campos?')) return;
-    ['local','equipamento','impacto','descricao','causa','focal'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('status').value = 'Em andamento';
-    relevancia = '';
-    ['Alta','Media','Baixa'].forEach(r => document.getElementById('rel-'+r).className = 'rel-btn');
-    document.getElementById('actions-list').innerHTML = '';
-    actionCount = 0;
-    addAction();
-    resetTimer();
-    updatePreview();
-  }
+function openModal(id){
+  var r=savedReports.find(function(x){return x.id===id;});if(!r)return;
+  document.getElementById('modal-title').textContent=r.local+(r.equip?' — '+r.equip:'')+' · '+r.createdAt;
+  document.getElementById('modal-report-text').textContent=r.report||'';
+  document.getElementById('modal-flash-text').textContent=r.flashText||'(não preenchido)';
+  document.getElementById('modal-acr-text').textContent=r.acrText||'(não preenchido)';
+  switchModalTab('report');document.getElementById('detail-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('detail-modal').classList.remove('open');}
+function switchModalTab(tab){
+  document.querySelectorAll('.modal-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.modal-page').forEach(function(p){p.classList.remove('active');});
+  var tabs=['report','flash','acr'];
+  document.querySelectorAll('.modal-tab')[tabs.indexOf(tab)].classList.add('active');
+  document.getElementById('modal-'+tab).classList.add('active');
+}
+function clearForm(){
+  if(!confirm('Limpar todos os campos?'))return;
+  ['local','equipamento','impacto','descricao','causa','focal'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('status').value='Em andamento';relevancia='';
+  ['Alta','Media','Baixa'].forEach(function(r){document.getElementById('rel-'+r).className='rel-btn';});
+  document.getElementById('actions-list').innerHTML='';actionCount=0;addAction();resetAll();syncFields();
+}
 </script>
 </body>
 </html>
