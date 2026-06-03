@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crisis Report Manager — MELI OPS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #252a35;
+    --accent: #ff5c28;
+    --accent2: #ffb800;
+    --green: #22d78a;
+    --blue: #3b82f6;
+    --text: #e8eaf0;
+    --text2: #8891a5;
+    --red: #ff3b5c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-badge {
+    background: var(--accent);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .header-title { font-size: 14px; font-weight: 600; color: var(--text2); }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,60,40,0.12);
+    border: 1px solid rgba(255,60,40,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 28px;
+  }
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .main { padding: 24px 28px; max-width: 900px; margin: 0 auto; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .field input, .field select, .field textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    transition: border 0.2s;
+    outline: none;
+    resize: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .field select option { background: var(--surface2); }
+
+  .relevance-group { display: flex; gap: 8px; }
+  .rel-btn {
+    flex: 1;
+    padding: 9px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-family: 'Sora', sans-serif;
+  }
+  .rel-btn.selected-alta { background: rgba(255,60,40,0.15); border-color: var(--red); color: var(--red); }
+  .rel-btn.selected-media { background: rgba(255,184,0,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .rel-btn.selected-baixa { background: rgba(34,215,138,0.15); border-color: var(--green); color: var(--green); }
+
+  .actions-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .action-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 20px;
+  }
+  .action-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    font-family: 'Sora', sans-serif;
+  }
+  .action-input::placeholder { color: var(--text2); }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 2px;
+    transition: color 0.2s;
+  }
+  .remove-btn:hover { color: var(--red); }
+
+  .add-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    font-size: 13px;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Sora', sans-serif;
+    width: 100%;
+  }
+  .add-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn {
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'Sora', sans-serif;
+    transition: all 0.18s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #ff6e40; }
+  .btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-secondary:hover { color: var(--text); }
+  .btn-green { background: var(--green); color: #0a0c10; }
+  .btn-green:hover { background: #30e898; }
+
+  .preview-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 120px;
+    position: relative;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  .log-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .log-empty span { display: block; font-size: 32px; margin-bottom: 10px; }
+
+  .crisis-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .crisis-card:hover { border-color: var(--accent); }
+  .crisis-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+  .crisis-title { font-weight: 700; font-size: 14px; }
+  .crisis-meta { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+  .crisis-desc { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-alta { background: rgba(255,60,40,0.15); color: var(--red); }
+  .badge-media { background: rgba(255,184,0,0.15); color: var(--accent2); }
+  .badge-baixa { background: rgba(34,215,138,0.15); color: var(--green); }
+
+  .timer-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .timer-label { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+  .timer-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
+  .timer-controls { display: flex; gap: 8px; }
+  .timer-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: 'Sora', sans-serif; transition: all 0.2s; }
+  .timer-btn.active { background: rgba(255,60,40,0.1); border-color: var(--accent); color: var(--accent); }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; }
+  .modal h3 { font-size: 15px; margin-bottom: 16px; padding-right: 30px; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-badge">MELI OPS</div>
+    <span class="header-title">Crisis Report Manager</span>
+  </div>
+  <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('form')">📋 Novo Report</div>
+  <div class="tab" onclick="switchTab('preview')">👁 Preview</div>
+  <div class="tab" onclick="switchTab('log')">📁 Histórico</div>
+</div>
+
+<div class="main">
+
+  <!-- FORM -->
+  <div class="page active" id="tab-form">
+
+    <div class="timer-bar">
+      <div>
+        <div class="timer-label">⏱ Duração da Crise</div>
+        <div class="timer-value" id="timer-display">00:00:00</div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn" id="timer-start-btn" onclick="toggleTimer()">▶ Iniciar</button>
+        <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="section-label">Identificação</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Local / CD</label>
+        <input type="text" id="local" placeholder="Ex: BRXSP10 - SORTER" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Equipamento / Esteira</label>
+        <input type="text" id="equipamento" placeholder="Ex: B080" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="data" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Início do Impacto</label>
+        <input type="time" id="inicio" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <div class="section-label">Impacto</div>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Descrição do Impacto</label>
+        <input type="text" id="impacto" placeholder="Ex: Parada da esteira B080" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:14px">
+      <label>Relevância</label>
+      <div class="relevance-group">
+        <button class="rel-btn" onclick="selectRel('Alta')" id="rel-Alta">🔴 Alta</button>
+        <button class="rel-btn" onclick="selectRel('Media')" id="rel-Media">🟡 Média</button>
+        <button class="rel-btn" onclick="selectRel('Baixa')" id="rel-Baixa">🟢 Baixa</button>
+      </div>
+    </div>
+
+    <div class="section-label">Descrição & Causa</div>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Descrição da Ocorrência</label>
+        <textarea id="descricao" rows="3" placeholder="Descreva o que está acontecendo..." oninput="updatePreview()"></textarea>
+      </div>
+      <div class="field">
+        <label>Causa Identificada</label>
+        <input type="text" id="causa" placeholder="Em análise / descreva a causa..." oninput="updatePreview()">
+      </div>
+    </div>
+
+    <div class="section-label">Ações Realizadas</div>
+    <div class="actions-list" id="actions-list"></div>
+    <button class="add-action-btn" onclick="addAction()">+ Adicionar Ação</button>
+
+    <div class="section-label">Focal Points & Status</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Responsáveis</label>
+        <input type="text" id="focal" placeholder="Ex: Nicollas / Saul" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Status Atual</label>
+        <select id="status" onchange="updatePreview()">
+          <option value="Em andamento">🔴 Em andamento</option>
+          <option value="Em análise">🟡 Em análise</option>
+          <option value="Em teste">🔵 Em teste</option>
+          <option value="Resolvido">🟢 Resolvido</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goToPreview()">👁 Ver Preview & Copiar</button>
+      <button class="btn btn-green" onclick="saveReport(event)">💾 Salvar no Histórico</button>
+      <button class="btn btn-secondary" onclick="clearForm()">🗑 Limpar</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="page" id="tab-preview">
+    <div class="section-label">Report Gerado</div>
+    <div class="preview-box">
+      <button class="copy-btn" id="copy-btn" onclick="copyReport()">📋 Copiar</button>
+      <span id="preview-text" style="display:block;margin-top:4px"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyReport()">📋 Copiar para Slack/WhatsApp</button>
+      <button class="btn btn-secondary" onclick="switchTab('form')">← Voltar ao Formulário</button>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="page" id="tab-log">
+    <div class="section-label">Crises Registradas</div>
+    <div id="log-container"></div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">Detalhe da Crise</h3>
+    <div class="preview-box" style="position:relative">
+      <button class="copy-btn" onclick="copyModal()">📋 Copiar</button>
+      <span id="modal-text" style="display:block;margin-top:4px;font-size:12px"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  let relevancia = '';
+  let actionCount = 0;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let timerRunning = false;
+  let savedReports = JSON.parse(localStorage.getItem('meli_crisis_reports') || '[]');
+
+  // Init
+  document.getElementById('data').value = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  document.getElementById('inicio').value = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  addAction();
+  renderLog();
+  updatePreview();
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const tabs = ['form','preview','log'];
+    document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    if(tab === 'preview') updatePreview();
+    if(tab === 'log') renderLog();
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('timer-start-btn');
+    if(!timerRunning) {
+      timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000);
+      timerRunning = true;
+      btn.textContent = '⏸ Pausar';
+      btn.classList.add('active');
+    } else {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      btn.textContent = '▶ Retomar';
+      btn.classList.remove('active');
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSeconds = 0;
+    updateTimerDisplay();
+    const btn = document.getElementById('timer-start-btn');
+    btn.textContent = '▶ Iniciar';
+    btn.classList.remove('active');
+  }
+
+  function updateTimerDisplay() {
+    const h = String(Math.floor(timerSeconds/3600)).padStart(2,'0');
+    const m = String(Math.floor((timerSeconds%3600)/60)).padStart(2,'0');
+    const s = String(timerSeconds%60).padStart(2,'0');
+    document.getElementById('timer-display').textContent = h+':'+m+':'+s;
+  }
+
+  function selectRel(val) {
+    relevancia = val;
+    ['Alta','Media','Baixa'].forEach(r => {
+      document.getElementById('rel-'+r).className = 'rel-btn';
+    });
+    const key = val === 'Alta' ? 'alta' : val === 'Media' ? 'media' : 'baixa';
+    document.getElementById('rel-'+val).className = 'rel-btn selected-'+key;
+    updatePreview();
+  }
+
+  function addAction() {
+    actionCount++;
+    const list = document.getElementById('actions-list');
+    const div = document.createElement('div');
+    div.className = 'action-item';
+    div.id = 'action-' + actionCount;
+    div.innerHTML = '<span class="action-num">' + actionCount + '</span><input class="action-input" placeholder="Descreva a ação realizada..." oninput="renumberActions(); updatePreview()"><button class="remove-btn" onclick="removeAction(' + actionCount + ')">×</button>';
+    list.appendChild(div);
+  }
+
+  function removeAction(id) {
+    const el = document.getElementById('action-' + id);
+    if(el) el.remove();
+    renumberActions();
+    updatePreview();
+  }
+
+  function renumberActions() {
+    document.querySelectorAll('.action-item').forEach((item, i) => {
+      item.querySelector('.action-num').textContent = (i+1);
+    });
+  }
+
+  function getActions() {
+    const lines = [];
+    document.querySelectorAll('.action-input').forEach((inp, i) => {
+      if(inp.value.trim()) lines.push((i+1) + ' - ' + inp.value.trim());
+    });
+    return lines.join('\n');
+  }
+
+  function buildReport() {
+    const local = document.getElementById('local').value || '[LOCAL]';
+    const data = document.getElementById('data').value;
+    const inicio = document.getElementById('inicio').value || '[HORA]';
+    const impacto = document.getElementById('impacto').value || '[IMPACTO]';
+    const rel = relevancia || '[RELEVÂNCIA]';
+    const desc = document.getElementById('descricao').value || '[DESCRIÇÃO]';
+    const causa = document.getElementById('causa').value || 'Em análise';
+    const focal = document.getElementById('focal').value || '[FOCAL POINT]';
+    const status = document.getElementById('status').value;
+    const actions = getActions();
+    const cdCode = local.split(' - ')[0] || local;
+    const dateFormatted = data ? new Date(data+'T12:00:00').toLocaleDateString('pt-BR') : '[DATA]';
+
+    let r = '📢🚨 ATUALIZAÇÃO DE CRISE - ' + cdCode + ' 📢🚨\n';
+    r += 'Ocorrência:\n';
+    r += 'Local: ' + local + '\n';
+    r += 'Impacto: ' + impacto + '\n';
+    r += 'Relevância: ' + rel + '\n';
+    r += 'Data: ' + dateFormatted + '   Início do Impacto: ' + inicio + '\n\n';
+    r += 'Descrição da Ocorrência:\n' + desc + '\n\n';
+    if(actions) r += 'Ações Realizadas:\n' + actions + '\n\n';
+    r += 'Causa: ' + causa + '\n';
+    r += 'Focal Point: ' + focal + '\n';
+    r += 'Status: ' + status;
+    return r;
+  }
+
+  function updatePreview() {
+    document.getElementById('preview-text').textContent = buildReport();
+  }
+
+  function goToPreview() {
+    updatePreview();
+    switchTab('preview');
+  }
+
+  function copyReport() {
+    navigator.clipboard.writeText(buildReport()).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✅ Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function saveReport(e) {
+    const report = buildReport();
+    const local = document.getElementById('local').value || 'Sem local';
+    const equip = document.getElementById('equipamento').value || '';
+    const status = document.getElementById('status').value;
+    const rel = relevancia || 'N/A';
+    const createdAt = new Date().toLocaleString('pt-BR');
+    savedReports.unshift({ id: Date.now(), local, equip, status, rel, report, createdAt });
+    localStorage.setItem('meli_crisis_reports', JSON.stringify(savedReports));
+    const btn = e.target;
+    const original = btn.textContent;
+    btn.textContent = '✅ Salvo!';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  }
+
+  function renderLog() {
+    const c = document.getElementById('log-container');
+    if(!savedReports.length) {
+      c.innerHTML = '<div class="log-empty"><span>📭</span>Nenhuma crise registrada ainda.</div>';
+      return;
+    }
+    c.innerHTML = savedReports.map(r => {
+      const relKey = (r.rel || '').toLowerCase().replace('é','e');
+      return '<div class="crisis-card" onclick="openModal(' + r.id + ')">' +
+        '<div class="crisis-card-header">' +
+          '<div><div class="crisis-title">' + r.local + (r.equip ? ' — '+r.equip : '') + '</div>' +
+          '<div class="crisis-meta">' + r.createdAt + '</div></div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">' +
+            '<span class="badge badge-' + relKey + '">' + r.rel + '</span>' +
+            '<span class="badge" style="background:var(--surface);color:var(--text2)">' + r.status + '</span>' +
+          '</div></div>' +
+        '<div class="crisis-desc">' + r.report.substring(0,120) + '...</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function openModal(id) {
+    const r = savedReports.find(x => x.id === id);
+    if(!r) return;
+    document.getElementById('modal-title').textContent = r.local + (r.equip ? ' — '+r.equip : '') + '  ·  ' + r.createdAt;
+    document.getElementById('modal-text').textContent = r.report;
+    document.getElementById('detail-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('detail-modal').classList.remove('open');
+  }
+
+  function copyModal() {
+    navigator.clipboard.writeText(document.getElementById('modal-text').textContent);
+  }
+
+  function clearForm() {
+    if(!confirm('Limpar todos os campos?')) return;
+    ['local','equipamento','impacto','descricao','causa','focal'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('status').value = 'Em andamento';
+    relevancia = '';
+    ['Alta','Media','Baixa'].forEach(r => document.getElementById('rel-'+r).className = 'rel-btn');
+    document.getElementById('actions-list').innerHTML = '';
+    actionCount = 0;
+    addAction();
+    resetTimer();
+    updatePreview();
+  }
+</script>
+</body>
+</html>
