@@ -302,22 +302,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <span id="preview-acr-text" style="display:block;margin-top:4px;font-size:12px"></span>
   </div>
 
-  <div class="section-label" style="margin-top:20px">Gerar &amp; Enviar ACR</div>
+  <div class="section-label" style="margin-top:20px">Exportar ACR</div>
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;">
-    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Gere o arquivo Excel (.xlsx) da ACR preenchida com os dados do formulário acima e envie por e-mail.</p>
-    <div class="form-grid" style="margin-bottom:14px">
-      <div class="field">
-        <label>📧 E-mail do Destinatário</label>
-        <input type="email" id="acr-email" placeholder="Ex: lider@empresa.com" />
-      </div>
-      <div class="field">
-        <label>📧 CC (opcional)</label>
-        <input type="email" id="acr-email-cc" placeholder="Ex: gestor@empresa.com" />
-      </div>
-    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Gere e baixe o arquivo Excel (.xlsx) com todos os dados da ACR preenchida acima.</p>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="generateACRXLSX()">📥 Gerar XLSX da ACR</button>
-      <button class="btn btn-green" onclick="sendACREmail()">📧 Abrir E-mail com ACR</button>
+      <button class="btn btn-primary" onclick="generateACRXLSX()">📥 Baixar XLSX da ACR</button>
     </div>
     <div id="acr-generate-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;"></div>
   </div>
@@ -884,38 +873,10 @@ function generateACRXLSX() {
   // Download
   XLSX.writeFile(wb, filename);
 
-  showACRStatus('success', '✅ Arquivo <strong>' + filename + '</strong> gerado e baixado com sucesso! Agora você pode anexá-lo ao e-mail.');
+  showACRStatus('success', '✅ Arquivo <strong>' + filename + '</strong> baixado com sucesso!');
 }
 
-function sendACREmail() {
-  var email = document.getElementById('acr-email').value.trim();
-  var cc = document.getElementById('acr-email-cc').value.trim();
-  var d = collectACRData();
-
-  if (!email) {
-    showACRStatus('warn', '⚠️ Informe ao menos um e-mail destinatário.');
-    return;
-  }
-
-  var subject = encodeURIComponent('ACR — ' + (d.falla || d.equip || 'Crise') + ' | ' + (d.local || '') + ' | ' + (d.data || ''));
-  var body = encodeURIComponent(
-    'Olá,\n\nSegue em anexo a Análise de Causa Raiz (ACR) referente ao evento abaixo:\n\n' +
-    'Local/CD: ' + d.local + '\n' +
-    'Equipamento: ' + d.equip + '\n' +
-    'Data: ' + d.data + '\n' +
-    'Falla/Impacto: ' + d.falla + '\n' +
-    'Causa Raiz: ' + d.causaRaiz + '\n\n' +
-    'O arquivo ACR (.xlsx) está em anexo.\n\n' +
-    'Elaborado por: ' + d.elabora + '\n' +
-    'Aprovação: ' + d.aprova + '\n\n' +
-    '---\nMELI OPS — Crisis Report Manager'
-  );
-
-  var mailto = 'mailto:' + email + '?subject=' + subject + '&body=' + body + (cc ? '&cc=' + encodeURIComponent(cc) : '');
-  window.location.href = mailto;
-
-  showACRStatus('info', '📧 Cliente de e-mail aberto. <strong>Lembre-se de anexar o arquivo .xlsx gerado!</strong>' + (lastGeneratedACRFilename ? ' (' + lastGeneratedACRFilename + ')' : '') + ' Se ainda não gerou o arquivo, clique em "Gerar XLSX" primeiro.');
-}
+// sendACREmail removido — download direto pelo botão Baixar XLSX
 
 function showACRStatus(type, msg) {
   var el = document.getElementById('acr-generate-status');
