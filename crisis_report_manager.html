@@ -111,8 +111,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .modal-page{display:none;}.modal-page.active{display:block;}
 .preview-label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;}
 ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.sync-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:5px;color:#7ab4ff;font-size:10px;font-weight:700;padding:2px 7px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;vertical-align:middle;margin-left:6px;}
+.field-synced input,.field-synced textarea{border-color:rgba(59,130,246,0.4)!important;background:rgba(59,130,246,0.05)!important;}
+.field-synced input:focus,.field-synced textarea:focus{border-color:var(--blue)!important;}
 @media(max-width:640px){.form-grid,.form-grid.three{grid-template-columns:1fr;}.why-row{grid-template-columns:1fr 1fr;}.check-label{flex:0 0 140px;}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="header">
@@ -258,9 +262,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div class="acr-section">
     <div class="acr-section-title"><span class="acr-section-num">S1</span> 6W + 2H — Definição do Problema</div>
     <div class="form-grid">
-      <div class="field"><label>1) What — O QUÊ?</label><textarea id="acr-what" rows="3" placeholder="Qual a falha? Quantifica a perda (tempo de afetação)..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>2) Where — ONDE?</label><textarea id="acr-where" rows="3" placeholder="Onde ocorreu? Local, equipamento, componente..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>3) When — QUANDO?</label>
+      <div class="field"><label>1) What — O QUÊ? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-what" rows="3" placeholder="Qual a falha? Quantifica a perda (tempo de afetação)..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>2) Where — ONDE? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-where" rows="3" placeholder="Onde ocorreu? Local, equipamento, componente..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>3) When — QUANDO? <span class="sync-badge">⟳ AUTO</span></label>
         <select id="acr-when-tipo" onchange="updateAcrPreview()" style="margin-bottom:6px">
           <option value="">Selecione o momento...</option>
           <option>Arranque de turno</option><option>Durante o turno</option><option>Fim de turno</option>
@@ -269,11 +273,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
         </select>
         <textarea id="acr-when" rows="2" placeholder="Complemento..." oninput="updateAcrPreview()"></textarea>
       </div>
-      <div class="field"><label>4) Who — QUEM / Quanto?</label><textarea id="acr-who" rows="3" placeholder="Quem está afetado? KPI impactado? Equipe envolvida..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>5) How — COMO?</label><textarea id="acr-how" rows="3" placeholder="Como ocorre? Estado atual vs condição normal..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>4) Who — QUEM / Quanto? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-who" rows="3" placeholder="Quem está afetado? KPI impactado? Equipe envolvida..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>5) How — COMO? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-how" rows="3" placeholder="Como ocorre? Estado atual vs condição normal..." oninput="updateAcrPreview()"></textarea></div>
       <div class="field"><label>6) How often — FREQUÊNCIA?</label><textarea id="acr-howoften" rows="3" placeholder="Com que frequência? Há repetibilidade?" oninput="updateAcrPreview()"></textarea></div>
     </div>
-    <div class="field" style="margin-top:8px"><label>Problema Focado</label><textarea id="acr-foco" rows="3" placeholder="Reescreva o problema de forma acotada após preencher 6W+2H..." oninput="updateAcrPreview()"></textarea></div>
+    <div class="field" style="margin-top:8px"><label>Problema Focado <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-foco" rows="3" placeholder="Reescreva o problema de forma acotada após preencher 6W+2H..." oninput="updateAcrPreview()"></textarea></div>
   </div>
 
   <div class="acr-section">
@@ -287,7 +291,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <button class="add-action-btn" onclick="addWhy()" style="margin-top:8px">+ Adicionar linha</button>
     <div class="field" style="margin-top:14px"><label>Causa Raiz Identificada</label><textarea id="acr-causa-raiz" rows="3" placeholder="Descreva a causa raiz e lições aprendidas..." oninput="updateAcrPreview()"></textarea></div>
     <div class="form-grid" style="margin-top:10px">
-      <div class="field"><label>Elaborado por</label><input type="text" id="acr-elabora" placeholder="Nome do analista" oninput="updateAcrPreview()"></div>
+      <div class="field"><label>Elaborado por <span class="sync-badge">⟳ AUTO</span></label><input type="text" id="acr-elabora" placeholder="Nome do analista" oninput="updateAcrPreview()"></div>
       <div class="field"><label>Aprovação</label><input type="text" id="acr-aprova" placeholder="Nome do líder" oninput="updateAcrPreview()"></div>
     </div>
   </div>
@@ -296,6 +300,26 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div class="preview-box">
     <button class="copy-btn" id="cp-acr" onclick="copyEl('cp-acr','preview-acr-text')">📋 Copiar Tudo</button>
     <span id="preview-acr-text" style="display:block;margin-top:4px;font-size:12px"></span>
+  </div>
+
+  <div class="section-label" style="margin-top:20px">Gerar &amp; Enviar ACR</div>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;">
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Gere o arquivo Excel (.xlsx) da ACR preenchida com os dados do formulário acima e envie por e-mail.</p>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="field">
+        <label>📧 E-mail do Destinatário</label>
+        <input type="email" id="acr-email" placeholder="Ex: lider@empresa.com" />
+      </div>
+      <div class="field">
+        <label>📧 CC (opcional)</label>
+        <input type="email" id="acr-email-cc" placeholder="Ex: gestor@empresa.com" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generateACRXLSX()">📥 Gerar XLSX da ACR</button>
+      <button class="btn btn-green" onclick="sendACREmail()">📧 Abrir E-mail com ACR</button>
+    </div>
+    <div id="acr-generate-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;"></div>
   </div>
 </div>
 
@@ -364,7 +388,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='log')renderLog();
   if(tab==='flash'){syncFlashFromReport();updateFlashPreview();updateEventLabels();}
-  if(tab==='acr'){updateEventLabels();updateAcrPreview();}
+  if(tab==='acr'){syncAcrFromReport();updateEventLabels();updateAcrPreview();}
 }
 
 function toggleTimer(){
@@ -476,6 +500,76 @@ function updateEventLabels(){
   ['flash-evento-label','acr-evento-label'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=label;});
 }
 
+
+function syncAcrFromReport(){
+  var local   = document.getElementById('local').value||'';
+  var equip   = document.getElementById('equipamento').value||'';
+  var data    = document.getElementById('data').value||'';
+  var inicio  = document.getElementById('inicio').value||'';
+  var impacto = document.getElementById('impacto').value||'';
+  var desc    = document.getElementById('descricao').value||'';
+  var causa   = document.getElementById('causa').value||'';
+  var focal   = document.getElementById('focal').value||'';
+
+  // Helper: only fill if field is empty (don't overwrite manual edits)
+  function fill(id, val){ var el=document.getElementById(id); if(el&&!el.value.trim()&&val) el.value=val; }
+  function fillForce(id, val){ var el=document.getElementById(id); if(el&&val) el.value=val; }
+
+  // Section 1 - 6W+2H
+  // What: impacto + causa (initial description of the failure)
+  fill('acr-what', impacto + (causa ? '\nCausa inicial: ' + causa : ''));
+
+  // Where: equip + local
+  fill('acr-where', (equip ? 'Equipamento: ' + equip + '\n' : '') + (local ? 'Local: ' + local : ''));
+
+  // When: data + hora inicio
+  var whenVal = '';
+  if(data){ var parts=data.split('-'); whenVal+='Data: '+parts[2]+'/'+parts[1]+'/'+parts[0]; }
+  if(inicio){ whenVal+=(whenVal?'\n':'')+'Início: '+inicio; }
+  fill('acr-when', whenVal);
+
+  // When tipo: auto-select "Durante o turno" if nothing selected
+  var whenSel = document.getElementById('acr-when-tipo');
+  if(whenSel && !whenSel.value) whenSel.value = 'Durante o turno';
+
+  // Who/Quanto: impacto operacional
+  fill('acr-who', impacto ? 'Impacto: ' + impacto : '');
+
+  // How: descrição completa
+  fill('acr-how', desc);
+
+  // Problema focado: composite
+  var foco = '';
+  if(local||equip) foco += (local||equip) + ' — ';
+  if(impacto) foco += impacto + '. ';
+  if(data){ var p=data.split('-'); foco += 'Data: '+p[2]+'/'+p[1]+'/'+p[0]; }
+  if(inicio) foco += ' às '+inicio+'.';
+  fill('acr-foco', foco.trim());
+
+  // Section 3 - First "why" row: prefill Causa Imediata with causa from Report
+  var ciEl = document.getElementById('why-ci-1');
+  if(ciEl && !ciEl.value.trim() && causa) ciEl.value = causa;
+
+  // Prefill first contramedida with actions from report
+  var actions = getActions();
+  var cmEl = document.getElementById('why-cm-1');
+  if(cmEl && !cmEl.value.trim() && actions) cmEl.value = actions;
+
+  // Prefill responsável
+  var respEl = document.getElementById('why-resp-1');
+  if(respEl && !respEl.value.trim() && focal) respEl.value = focal;
+
+  // Approval: prefill Elaborado por with focal point
+  fill('acr-elabora', focal);
+
+  // Visual feedback: add synced class to auto fields
+  ['acr-what','acr-where','acr-when','acr-who','acr-how','acr-foco','acr-elabora'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.closest('.field')&&el.closest('.field').classList.add('field-synced');
+  });
+
+  updateAcrPreview();
+}
 function syncFlashFromReport(){
   var inicio=document.getElementById('inicio').value;
   if(inicio)document.getElementById('flash-inicio')&&(document.getElementById('flash-inicio').value=inicio);
@@ -642,6 +736,202 @@ function clearForm(){
   document.getElementById('status').value='Em andamento';relevancia='';
   ['Alta','Media','Baixa'].forEach(function(r){document.getElementById('rel-'+r).className='rel-btn';});
   document.getElementById('actions-list').innerHTML='';actionCount=0;addAction();resetAll();syncFields();
+}
+
+// ===== ACR XLSX GENERATION =====
+var lastGeneratedACRBlob = null;
+var lastGeneratedACRFilename = '';
+
+function collectACRData() {
+  var local = document.getElementById('local').value || '';
+  var equip = document.getElementById('equipamento').value || '';
+  var data = document.getElementById('data').value || '';
+  var folio = local.replace(/[^A-Z0-9]/gi,'') + '_' + (data||new Date().toISOString().split('T')[0]).replace(/-/g,'');
+
+  var ishikawaRows = ISHIKAWA.map(function(item) {
+    var sel = document.getElementById('ishi-' + item.n);
+    var obs = document.getElementById('ishi-obs-' + item.n);
+    return {
+      n: item.n,
+      title: item.t,
+      status: sel ? sel.value.replace(/[✅❌]/g,'').trim() : '',
+      obs: obs ? obs.value : ''
+    };
+  });
+
+  var whys = [];
+  document.querySelectorAll('[id^="why-ci-"]').forEach(function(el) {
+    var n = el.id.replace('why-ci-', '');
+    whys.push({
+      ci: el.value,
+      w1: (document.getElementById('why-1-' + n) || {}).value || '',
+      w2: (document.getElementById('why-2-' + n) || {}).value || '',
+      cr: (document.getElementById('why-cr-' + n) || {}).value || '',
+      cm: (document.getElementById('why-cm-' + n) || {}).value || '',
+      resp: (document.getElementById('why-resp-' + n) || {}).value || '',
+      dt: (document.getElementById('why-data-' + n) || {}).value || ''
+    });
+  });
+
+  return {
+    local: local,
+    equip: equip,
+    data: data,
+    folio: folio,
+    notifica: '',
+    falla: document.getElementById('impacto').value || '',
+    what: document.getElementById('acr-what').value || '',
+    where: document.getElementById('acr-where').value || '',
+    whenTipo: document.getElementById('acr-when-tipo').value || '',
+    when: document.getElementById('acr-when').value || '',
+    who: document.getElementById('acr-who').value || '',
+    how: document.getElementById('acr-how').value || '',
+    howoften: document.getElementById('acr-howoften').value || '',
+    foco: document.getElementById('acr-foco').value || '',
+    ishikawa: ishikawaRows,
+    whys: whys,
+    causaRaiz: document.getElementById('acr-causa-raiz').value || '',
+    elabora: document.getElementById('acr-elabora').value || '',
+    aprova: document.getElementById('acr-aprova').value || '',
+    dataAprov: data
+  };
+}
+
+function generateACRXLSX() {
+  if (typeof XLSX === 'undefined') {
+    showACRStatus('error', '❌ Biblioteca XLSX não carregada. Verifique sua conexão e recarregue a página.');
+    return;
+  }
+
+  var d = collectACRData();
+  var rows = [];
+
+  // Helper to push a row
+  function r(a, b, c) { rows.push([a || '', b || '', c || '']); }
+  function rFull(txt) { rows.push([txt || '', '', '']); }
+  function blank() { rows.push(['', '', '']); }
+
+  // Header
+  r('Versão: 2.0 Abril 2025', '', 'Analisis Causa Raiz');
+  blank();
+
+  // Section 1
+  rFull('Sección 1 - Definición del problema: ' + (d.falla || ''));
+  r('Notifica:', '', 'Número de folio: ' + d.folio);
+  r('Falla / Defecto:', '', 'Site / Equipo: ' + d.equip + '  |  Data: ' + d.data);
+  r('', d.falla, '');
+  blank();
+  rFull('6W + 2H — Enfoque el problema:');
+  r('1) What / O QUÊ?', '2) Where / ONDE? + WHY', '3) When / QUANDO?');
+  r(d.what, d.where, (d.whenTipo ? d.whenTipo + '\n' : '') + d.when);
+  blank();
+  r('4) Who / QUEM? + Quanto?', '5) How / COMO?', '6) How often / FREQUÊNCIA?');
+  r(d.who, d.how, d.howoften);
+  blank();
+  r('Problema Focado:', '', '');
+  rFull(d.foco);
+  blank();
+
+  // Section 2
+  rFull('Sección 2 - Análisis de Ishikawa');
+  r('No.', 'Revisar', 'Si / No / N/A | Resultado / Comentários');
+  d.ishikawa.forEach(function(item) {
+    r(item.n + '. ' + item.title, '', (item.status || '—') + (item.obs ? ' | ' + item.obs : ''));
+  });
+  blank();
+
+  // Section 3
+  rFull('Sección 3 - 5 Porquês + Contramedidas');
+  r('Causa Imediata', 'Por quê? (1) | Por quê? (2)', 'Causa Raiz | Contramedida | Resp | Data');
+  d.whys.forEach(function(w) {
+    if (w.ci || w.w1 || w.cr) {
+      r(w.ci, (w.w1 || '—') + (w.w2 ? '\n' + w.w2 : ''), (w.cr || '—') + (w.cm ? '\nContramedida: ' + w.cm : '') + (w.resp ? '\nResp: ' + w.resp : '') + (w.dt ? '\nData: ' + w.dt : ''));
+    }
+  });
+  blank();
+  r('Causa Raiz Identificada:', '', '');
+  rFull(d.causaRaiz);
+  blank();
+
+  // Approval
+  r('Elabora: ' + d.elabora, 'Aprovação: ' + d.aprova, 'Fecha de Aprovação: ' + d.dataAprov);
+
+  // Build workbook
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Column widths
+  ws['!cols'] = [{ wch: 45 }, { wch: 45 }, { wch: 55 }];
+
+  // Merge first column header-like cells (col A full width)
+  var merges = [];
+  rows.forEach(function(row, i) {
+    if (row[1] === '' && row[2] === '' && row[0] !== '') {
+      merges.push({ s: { r: i, c: 0 }, e: { r: i, c: 2 } });
+    }
+  });
+  ws['!merges'] = merges;
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'ACR');
+
+  var filename = 'ACR_' + (d.local.replace(/[^A-Z0-9]/gi, '') || 'EVENTO') + '_' + (d.data || new Date().toISOString().split('T')[0]).replace(/-/g,'') + '.xlsx';
+  lastGeneratedACRFilename = filename;
+
+  // Generate blob for email attach hint
+  var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  lastGeneratedACRBlob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  // Download
+  XLSX.writeFile(wb, filename);
+
+  showACRStatus('success', '✅ Arquivo <strong>' + filename + '</strong> gerado e baixado com sucesso! Agora você pode anexá-lo ao e-mail.');
+}
+
+function sendACREmail() {
+  var email = document.getElementById('acr-email').value.trim();
+  var cc = document.getElementById('acr-email-cc').value.trim();
+  var d = collectACRData();
+
+  if (!email) {
+    showACRStatus('warn', '⚠️ Informe ao menos um e-mail destinatário.');
+    return;
+  }
+
+  var subject = encodeURIComponent('ACR — ' + (d.falla || d.equip || 'Crise') + ' | ' + (d.local || '') + ' | ' + (d.data || ''));
+  var body = encodeURIComponent(
+    'Olá,\n\nSegue em anexo a Análise de Causa Raiz (ACR) referente ao evento abaixo:\n\n' +
+    'Local/CD: ' + d.local + '\n' +
+    'Equipamento: ' + d.equip + '\n' +
+    'Data: ' + d.data + '\n' +
+    'Falla/Impacto: ' + d.falla + '\n' +
+    'Causa Raiz: ' + d.causaRaiz + '\n\n' +
+    'O arquivo ACR (.xlsx) está em anexo.\n\n' +
+    'Elaborado por: ' + d.elabora + '\n' +
+    'Aprovação: ' + d.aprova + '\n\n' +
+    '---\nMELI OPS — Crisis Report Manager'
+  );
+
+  var mailto = 'mailto:' + email + '?subject=' + subject + '&body=' + body + (cc ? '&cc=' + encodeURIComponent(cc) : '');
+  window.location.href = mailto;
+
+  showACRStatus('info', '📧 Cliente de e-mail aberto. <strong>Lembre-se de anexar o arquivo .xlsx gerado!</strong>' + (lastGeneratedACRFilename ? ' (' + lastGeneratedACRFilename + ')' : '') + ' Se ainda não gerou o arquivo, clique em "Gerar XLSX" primeiro.');
+}
+
+function showACRStatus(type, msg) {
+  var el = document.getElementById('acr-generate-status');
+  var colors = {
+    success: { bg: 'rgba(34,215,138,0.12)', border: 'var(--green)', color: 'var(--green)' },
+    error:   { bg: 'rgba(255,60,40,0.12)',  border: 'var(--red)',   color: 'var(--red)' },
+    warn:    { bg: 'rgba(255,184,0,0.12)',   border: 'var(--accent2)', color: 'var(--accent2)' },
+    info:    { bg: 'rgba(59,130,246,0.1)',   border: 'var(--blue)', color: '#7ab4ff' }
+  };
+  var c = colors[type] || colors.info;
+  el.style.display = 'block';
+  el.style.background = c.bg;
+  el.style.border = '1px solid ' + c.border;
+  el.style.color = c.color;
+  el.innerHTML = msg;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
 </body>
