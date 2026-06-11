@@ -6,19 +6,19 @@
 <title>Crisis Report Manager — MELI OPS</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
-:root{--bg:#0a0c10;--surface:#111318;--surface2:#181c24;--border:#252a35;--accent:#ff5c28;--accent2:#ffb800;--green:#22d78a;--blue:#3b82f6;--text:#e8eaf0;--text2:#8891a5;--red:#ff3b5c;}
+:root{--bg:#f5f5f5;--surface:#ffffff;--surface2:#f0f0f0;--border:#e0e0e0;--accent:#ffe600;--accent-dark:#333333;--accent2:#ff6200;--green:#00a650;--blue:#3483fa;--text:#333333;--text2:#666666;--red:#e53935;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header{background:#ffe600;border-bottom:2px solid #e6cf00;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .header-left{display:flex;align-items:center;gap:12px;}
-.logo-badge{background:var(--accent);color:white;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 9px;border-radius:4px;letter-spacing:1px;}
+.logo-badge{background:#333333;color:#ffe600;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 9px;border-radius:4px;letter-spacing:1px;}
 .header-title{font-size:14px;font-weight:600;color:var(--text2);}
-.live-badge{display:flex;align-items:center;gap:6px;background:rgba(255,60,40,0.12);border:1px solid rgba(255,60,40,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1s infinite;}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:#333333;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#333333;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 28px;overflow-x:auto;}
-.tab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tabs{display:flex;border-bottom:2px solid var(--border);background:var(--surface);padding:0 28px;overflow-x:auto;}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab.active{color:#333333;border-bottom-color:#333333;font-weight:700;}
 .tab:hover:not(.active){color:var(--text);}
 .main{padding:24px 28px;max-width:920px;margin:0 auto;}
 .page{display:none;}.page.active{display:block;}
@@ -32,25 +32,25 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .field select option{background:var(--surface2);}
 .relevance-group{display:flex;gap:8px;}
 .rel-btn{flex:1;padding:9px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Sora',sans-serif;}
-.rel-btn.selected-alta{background:rgba(255,60,40,0.15);border-color:var(--red);color:var(--red);}
-.rel-btn.selected-media{background:rgba(255,184,0,0.15);border-color:var(--accent2);color:var(--accent2);}
-.rel-btn.selected-baixa{background:rgba(34,215,138,0.15);border-color:var(--green);color:var(--green);}
+.rel-btn.selected-alta{background:rgba(229,57,53,0.1);border-color:#e53935;color:#e53935;}
+.rel-btn.selected-media{background:rgba(255,98,0,0.1);border-color:#ff6200;color:#ff6200;}
+.rel-btn.selected-baixa{background:rgba(0,166,80,0.1);border-color:#00a650;color:#00a650;}
 .actions-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
 .action-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
-.action-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;min-width:20px;}
+.action-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3483fa;font-weight:700;min-width:20px;}
 .action-input{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;font-family:'Sora',sans-serif;}
 .action-input::placeholder{color:var(--text2);}
 .remove-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0 2px;transition:color 0.2s;}
 .remove-btn:hover{color:var(--red);}
 .add-action-btn{display:flex;align-items:center;gap:8px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--text2);font-size:13px;padding:9px 14px;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif;width:100%;}
 .add-action-btn:hover{border-color:var(--accent);color:var(--accent);}
-.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-label{font-size:11px;font-weight:700;color:#333333;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 .btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
 .btn{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Sora',sans-serif;transition:all 0.18s;}
-.btn-primary{background:var(--accent);color:white;}.btn-primary:hover{background:#ff6e40;}
+.btn-primary{background:#ffe600;color:#333333;border:1px solid #e6cf00;font-weight:700;}.btn-primary:hover{background:#ffe033;}
 .btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}.btn-secondary:hover{color:var(--text);}
-.btn-green{background:var(--green);color:#0a0c10;}.btn-green:hover{background:#30e898;}
+.btn-green{background:#00a650;color:#ffffff;font-weight:700;}.btn-green:hover{background:#00883f;}
 .preview-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:80px;position:relative;}
 .copy-btn{position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;transition:all 0.2s;}
 .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -58,7 +58,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .timer-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .timer-section{display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
 .timer-label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
-.timer-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--accent);}
+.timer-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#3483fa;}
 .countdown-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--green);}
 .countdown-value.warning{color:var(--accent2);}
 .countdown-value.urgent{color:var(--red);animation:blink 0.5s infinite;}
@@ -77,7 +77,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .event-badge{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#7ab4ff;}
 .acr-section{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
 .acr-section-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.acr-section-num{background:var(--accent);color:white;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.acr-section-num{background:#333333;color:#ffe600;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
 .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .checklist-item:last-child{border-bottom:none;}
 .check-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:4px 8px;font-family:'Sora',sans-serif;outline:none;min-width:100px;flex-shrink:0;}
@@ -111,9 +111,6 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .modal-page{display:none;}.modal-page.active{display:block;}
 .preview-label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;}
 ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-.sync-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:5px;color:#7ab4ff;font-size:10px;font-weight:700;padding:2px 7px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;vertical-align:middle;margin-left:6px;}
-.field-synced input,.field-synced textarea{border-color:rgba(59,130,246,0.4)!important;background:rgba(59,130,246,0.05)!important;}
-.field-synced input:focus,.field-synced textarea:focus{border-color:var(--blue)!important;}
 @media(max-width:640px){.form-grid,.form-grid.three{grid-template-columns:1fr;}.why-row{grid-template-columns:1fr 1fr;}.check-label{flex:0 0 140px;}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -262,9 +259,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div class="acr-section">
     <div class="acr-section-title"><span class="acr-section-num">S1</span> 6W + 2H — Definição do Problema</div>
     <div class="form-grid">
-      <div class="field"><label>1) What — O QUÊ? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-what" rows="3" placeholder="Qual a falha? Quantifica a perda (tempo de afetação)..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>2) Where — ONDE? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-where" rows="3" placeholder="Onde ocorreu? Local, equipamento, componente..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>3) When — QUANDO? <span class="sync-badge">⟳ AUTO</span></label>
+      <div class="field"><label>1) What — O QUÊ? <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><textarea id="acr-what" rows="3" placeholder="Qual a falha? Quantifica a perda (tempo de afetação)..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>2) Where — ONDE? <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><textarea id="acr-where" rows="3" placeholder="Onde ocorreu? Local, equipamento, componente..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>3) When — QUANDO? <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label>
         <select id="acr-when-tipo" onchange="updateAcrPreview()" style="margin-bottom:6px">
           <option value="">Selecione o momento...</option>
           <option>Arranque de turno</option><option>Durante o turno</option><option>Fim de turno</option>
@@ -273,11 +270,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
         </select>
         <textarea id="acr-when" rows="2" placeholder="Complemento..." oninput="updateAcrPreview()"></textarea>
       </div>
-      <div class="field"><label>4) Who — QUEM / Quanto? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-who" rows="3" placeholder="Quem está afetado? KPI impactado? Equipe envolvida..." oninput="updateAcrPreview()"></textarea></div>
-      <div class="field"><label>5) How — COMO? <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-how" rows="3" placeholder="Como ocorre? Estado atual vs condição normal..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>4) Who — QUEM / Quanto? <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><textarea id="acr-who" rows="3" placeholder="Quem está afetado? KPI impactado? Equipe envolvida..." oninput="updateAcrPreview()"></textarea></div>
+      <div class="field"><label>5) How — COMO? <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><textarea id="acr-how" rows="3" placeholder="Como ocorre? Estado atual vs condição normal..." oninput="updateAcrPreview()"></textarea></div>
       <div class="field"><label>6) How often — FREQUÊNCIA?</label><textarea id="acr-howoften" rows="3" placeholder="Com que frequência? Há repetibilidade?" oninput="updateAcrPreview()"></textarea></div>
     </div>
-    <div class="field" style="margin-top:8px"><label>Problema Focado <span class="sync-badge">⟳ AUTO</span></label><textarea id="acr-foco" rows="3" placeholder="Reescreva o problema de forma acotada após preencher 6W+2H..." oninput="updateAcrPreview()"></textarea></div>
+    <div class="field" style="margin-top:8px"><label>Problema Focado <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><textarea id="acr-foco" rows="3" placeholder="Reescreva o problema de forma acotada após preencher 6W+2H..." oninput="updateAcrPreview()"></textarea></div>
   </div>
 
   <div class="acr-section">
@@ -291,7 +288,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <button class="add-action-btn" onclick="addWhy()" style="margin-top:8px">+ Adicionar linha</button>
     <div class="field" style="margin-top:14px"><label>Causa Raiz Identificada</label><textarea id="acr-causa-raiz" rows="3" placeholder="Descreva a causa raiz e lições aprendidas..." oninput="updateAcrPreview()"></textarea></div>
     <div class="form-grid" style="margin-top:10px">
-      <div class="field"><label>Elaborado por <span class="sync-badge">⟳ AUTO</span></label><input type="text" id="acr-elabora" placeholder="Nome do analista" oninput="updateAcrPreview()"></div>
+      <div class="field"><label>Elaborado por <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(52,131,250,0.1);border:1px solid rgba(52,131,250,0.3);border-radius:4px;color:#3483fa;font-size:10px;font-weight:700;padding:1px 6px;font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:5px;">⟳ AUTO</span></label><input type="text" id="acr-elabora" placeholder="Nome do analista" oninput="updateAcrPreview()"></div>
       <div class="field"><label>Aprovação</label><input type="text" id="acr-aprova" placeholder="Nome do líder" oninput="updateAcrPreview()"></div>
     </div>
   </div>
@@ -306,7 +303,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;">
     <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Gere e baixe o arquivo Excel (.xlsx) com todos os dados da ACR preenchida acima.</p>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="generateACRXLSX()">📥 Baixar XLSX da ACR</button>
+      <button class="btn btn-primary" onclick="generateACRXLSX()" style="font-size:14px;padding:12px 28px;">📥 Baixar XLSX da ACR</button>
     </div>
     <div id="acr-generate-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;"></div>
   </div>
@@ -489,76 +486,6 @@ function updateEventLabels(){
   ['flash-evento-label','acr-evento-label'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=label;});
 }
 
-
-function syncAcrFromReport(){
-  var local   = document.getElementById('local').value||'';
-  var equip   = document.getElementById('equipamento').value||'';
-  var data    = document.getElementById('data').value||'';
-  var inicio  = document.getElementById('inicio').value||'';
-  var impacto = document.getElementById('impacto').value||'';
-  var desc    = document.getElementById('descricao').value||'';
-  var causa   = document.getElementById('causa').value||'';
-  var focal   = document.getElementById('focal').value||'';
-
-  // Helper: only fill if field is empty (don't overwrite manual edits)
-  function fill(id, val){ var el=document.getElementById(id); if(el&&!el.value.trim()&&val) el.value=val; }
-  function fillForce(id, val){ var el=document.getElementById(id); if(el&&val) el.value=val; }
-
-  // Section 1 - 6W+2H
-  // What: impacto + causa (initial description of the failure)
-  fill('acr-what', impacto + (causa ? '\nCausa inicial: ' + causa : ''));
-
-  // Where: equip + local
-  fill('acr-where', (equip ? 'Equipamento: ' + equip + '\n' : '') + (local ? 'Local: ' + local : ''));
-
-  // When: data + hora inicio
-  var whenVal = '';
-  if(data){ var parts=data.split('-'); whenVal+='Data: '+parts[2]+'/'+parts[1]+'/'+parts[0]; }
-  if(inicio){ whenVal+=(whenVal?'\n':'')+'Início: '+inicio; }
-  fill('acr-when', whenVal);
-
-  // When tipo: auto-select "Durante o turno" if nothing selected
-  var whenSel = document.getElementById('acr-when-tipo');
-  if(whenSel && !whenSel.value) whenSel.value = 'Durante o turno';
-
-  // Who/Quanto: impacto operacional
-  fill('acr-who', impacto ? 'Impacto: ' + impacto : '');
-
-  // How: descrição completa
-  fill('acr-how', desc);
-
-  // Problema focado: composite
-  var foco = '';
-  if(local||equip) foco += (local||equip) + ' — ';
-  if(impacto) foco += impacto + '. ';
-  if(data){ var p=data.split('-'); foco += 'Data: '+p[2]+'/'+p[1]+'/'+p[0]; }
-  if(inicio) foco += ' às '+inicio+'.';
-  fill('acr-foco', foco.trim());
-
-  // Section 3 - First "why" row: prefill Causa Imediata with causa from Report
-  var ciEl = document.getElementById('why-ci-1');
-  if(ciEl && !ciEl.value.trim() && causa) ciEl.value = causa;
-
-  // Prefill first contramedida with actions from report
-  var actions = getActions();
-  var cmEl = document.getElementById('why-cm-1');
-  if(cmEl && !cmEl.value.trim() && actions) cmEl.value = actions;
-
-  // Prefill responsável
-  var respEl = document.getElementById('why-resp-1');
-  if(respEl && !respEl.value.trim() && focal) respEl.value = focal;
-
-  // Approval: prefill Elaborado por with focal point
-  fill('acr-elabora', focal);
-
-  // Visual feedback: add synced class to auto fields
-  ['acr-what','acr-where','acr-when','acr-who','acr-how','acr-foco','acr-elabora'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.closest('.field')&&el.closest('.field').classList.add('field-synced');
-  });
-
-  updateAcrPreview();
-}
 function syncFlashFromReport(){
   var inicio=document.getElementById('inicio').value;
   if(inicio)document.getElementById('flash-inicio')&&(document.getElementById('flash-inicio').value=inicio);
@@ -727,172 +654,179 @@ function clearForm(){
   document.getElementById('actions-list').innerHTML='';actionCount=0;addAction();resetAll();syncFields();
 }
 
-// ===== ACR XLSX GENERATION =====
-var lastGeneratedACRBlob = null;
+// ===== SYNC ACR FROM REPORT =====
+function syncAcrFromReport(){
+  var local   = document.getElementById('local').value||'';
+  var equip   = document.getElementById('equipamento').value||'';
+  var data    = document.getElementById('data').value||'';
+  var inicio  = document.getElementById('inicio').value||'';
+  var impacto = document.getElementById('impacto').value||'';
+  var desc    = document.getElementById('descricao').value||'';
+  var causa   = document.getElementById('causa').value||'';
+  var focal   = document.getElementById('focal').value||'';
+
+  function fill(id,val){var el=document.getElementById(id);if(el&&!el.value.trim()&&val)el.value=val;}
+
+  fill('acr-what', impacto+(causa?'\nCausa inicial: '+causa:''));
+  fill('acr-where', (equip?'Equipamento: '+equip+'\n':'')+(local?'Local: '+local:''));
+
+  var whenVal='';
+  if(data){var p=data.split('-');whenVal+='Data: '+p[2]+'/'+p[1]+'/'+p[0];}
+  if(inicio){whenVal+=(whenVal?'\n':'')+'Início: '+inicio;}
+  fill('acr-when', whenVal);
+
+  var ws=document.getElementById('acr-when-tipo');
+  if(ws&&!ws.value)ws.value='Durante o turno';
+
+  fill('acr-who', impacto?'Impacto: '+impacto:'');
+  fill('acr-how', desc);
+
+  var foco='';
+  if(local||equip)foco+=(local||equip)+' — ';
+  if(impacto)foco+=impacto+'. ';
+  if(data){var p=data.split('-');foco+='Data: '+p[2]+'/'+p[1]+'/'+p[0];}
+  if(inicio)foco+=' às '+inicio+'.';
+  fill('acr-foco', foco.trim());
+
+  var ciEl=document.getElementById('why-ci-1');
+  if(ciEl&&!ciEl.value.trim()&&causa)ciEl.value=causa;
+
+  var actions=getActions&&getActions()||'';
+  var cmEl=document.getElementById('why-cm-1');
+  if(cmEl&&!cmEl.value.trim()&&actions)cmEl.value=actions;
+
+  var respEl=document.getElementById('why-resp-1');
+  if(respEl&&!respEl.value.trim()&&focal)respEl.value=focal;
+
+  fill('acr-elabora', focal);
+  updateAcrPreview&&updateAcrPreview();
+}
+
+// ===== GERAR XLSX DA ACR =====
 var lastGeneratedACRFilename = '';
 
-function collectACRData() {
-  var local = document.getElementById('local').value || '';
-  var equip = document.getElementById('equipamento').value || '';
-  var data = document.getElementById('data').value || '';
-  var folio = local.replace(/[^A-Z0-9]/gi,'') + '_' + (data||new Date().toISOString().split('T')[0]).replace(/-/g,'');
-
-  var ishikawaRows = ISHIKAWA.map(function(item) {
-    var sel = document.getElementById('ishi-' + item.n);
-    var obs = document.getElementById('ishi-obs-' + item.n);
-    return {
-      n: item.n,
-      title: item.t,
-      status: sel ? sel.value.replace(/[✅❌]/g,'').trim() : '',
-      obs: obs ? obs.value : ''
-    };
-  });
-
-  var whys = [];
-  document.querySelectorAll('[id^="why-ci-"]').forEach(function(el) {
-    var n = el.id.replace('why-ci-', '');
+function collectACRData(){
+  var local   = document.getElementById('local').value||'';
+  var equip   = document.getElementById('equipamento').value||'';
+  var data    = document.getElementById('data').value||'';
+  var folio   = (local.replace(/[^A-Z0-9]/gi,'')||'SITE')+'_'+(data||new Date().toISOString().split('T')[0]).replace(/-/g,'');
+  var ishikawaRows=[];
+  if(typeof ISHIKAWA!=='undefined'){
+    ISHIKAWA.forEach(function(item){
+      var sel=document.getElementById('ishi-'+item.n);
+      var obs=document.getElementById('ishi-obs-'+item.n);
+      ishikawaRows.push({n:item.n,title:item.t,status:sel?sel.value.replace(/[✅❌]/g,'').trim():'',obs:obs?obs.value:''});
+    });
+  }
+  var whys=[];
+  document.querySelectorAll('[id^="why-ci-"]').forEach(function(el){
+    var n=el.id.replace('why-ci-','');
     whys.push({
-      ci: el.value,
-      w1: (document.getElementById('why-1-' + n) || {}).value || '',
-      w2: (document.getElementById('why-2-' + n) || {}).value || '',
-      cr: (document.getElementById('why-cr-' + n) || {}).value || '',
-      cm: (document.getElementById('why-cm-' + n) || {}).value || '',
-      resp: (document.getElementById('why-resp-' + n) || {}).value || '',
-      dt: (document.getElementById('why-data-' + n) || {}).value || ''
+      ci:el.value,
+      w1:(document.getElementById('why-1-'+n)||{}).value||'',
+      w2:(document.getElementById('why-2-'+n)||{}).value||'',
+      cr:(document.getElementById('why-cr-'+n)||{}).value||'',
+      cm:(document.getElementById('why-cm-'+n)||{}).value||'',
+      resp:(document.getElementById('why-resp-'+n)||{}).value||'',
+      dt:(document.getElementById('why-data-'+n)||{}).value||''
     });
   });
-
   return {
-    local: local,
-    equip: equip,
-    data: data,
-    folio: folio,
-    notifica: '',
-    falla: document.getElementById('impacto').value || '',
-    what: document.getElementById('acr-what').value || '',
-    where: document.getElementById('acr-where').value || '',
-    whenTipo: document.getElementById('acr-when-tipo').value || '',
-    when: document.getElementById('acr-when').value || '',
-    who: document.getElementById('acr-who').value || '',
-    how: document.getElementById('acr-how').value || '',
-    howoften: document.getElementById('acr-howoften').value || '',
-    foco: document.getElementById('acr-foco').value || '',
-    ishikawa: ishikawaRows,
-    whys: whys,
-    causaRaiz: document.getElementById('acr-causa-raiz').value || '',
-    elabora: document.getElementById('acr-elabora').value || '',
-    aprova: document.getElementById('acr-aprova').value || '',
-    dataAprov: data
+    local:local, equip:equip, data:data, folio:folio,
+    falla:document.getElementById('impacto').value||'',
+    what:document.getElementById('acr-what').value||'',
+    where:document.getElementById('acr-where').value||'',
+    whenTipo:document.getElementById('acr-when-tipo').value||'',
+    when:document.getElementById('acr-when').value||'',
+    who:document.getElementById('acr-who').value||'',
+    how:document.getElementById('acr-how').value||'',
+    howoften:document.getElementById('acr-howoften').value||'',
+    foco:document.getElementById('acr-foco').value||'',
+    ishikawa:ishikawaRows, whys:whys,
+    causaRaiz:document.getElementById('acr-causa-raiz').value||'',
+    elabora:document.getElementById('acr-elabora').value||'',
+    aprova:document.getElementById('acr-aprova').value||'',
+    dataAprov:data
   };
 }
 
-function generateACRXLSX() {
-  if (typeof XLSX === 'undefined') {
-    showACRStatus('error', '❌ Biblioteca XLSX não carregada. Verifique sua conexão e recarregue a página.');
+function generateACRXLSX(){
+  if(typeof XLSX==='undefined'){
+    showACRStatus('error','❌ Biblioteca XLSX não carregada. Verifique sua conexão.');
     return;
   }
+  var d=collectACRData();
+  var rows=[];
+  function r(a,b,bb){rows.push([a||'',b||'',bb||'']);}
+  function blank(){rows.push(['','','']);}
 
-  var d = collectACRData();
-  var rows = [];
-
-  // Helper to push a row
-  function r(a, b, c) { rows.push([a || '', b || '', c || '']); }
-  function rFull(txt) { rows.push([txt || '', '', '']); }
-  function blank() { rows.push(['', '', '']); }
-
-  // Header
-  r('Versão: 2.0 Abril 2025', '', 'Analisis Causa Raiz');
+  r('Versão: 2.0  Abril 2025','','Analisis Causa Raiz');
   blank();
-
-  // Section 1
-  rFull('Sección 1 - Definición del problema: ' + (d.falla || ''));
-  r('Notifica:', '', 'Número de folio: ' + d.folio);
-  r('Falla / Defecto:', '', 'Site / Equipo: ' + d.equip + '  |  Data: ' + d.data);
-  r('', d.falla, '');
+  r('Sección 1 — Definición del problema: '+(d.falla||''),'','');
+  r('Notifica:','','Número de folio: '+d.folio);
+  r('Falla / Defecto:','','Site / Equipo: '+d.equip+'  |  Data: '+d.data);
+  r('',d.falla,'');
   blank();
-  rFull('6W + 2H — Enfoque el problema:');
-  r('1) What / O QUÊ?', '2) Where / ONDE? + WHY', '3) When / QUANDO?');
-  r(d.what, d.where, (d.whenTipo ? d.whenTipo + '\n' : '') + d.when);
+  r('6W + 2H — Enfoque el problema:','','');
+  r('1) What / O QUÊ?','2) Where / ONDE?','3) When / QUANDO?');
+  r(d.what, d.where, (d.whenTipo?d.whenTipo+'\n':'')+d.when);
   blank();
-  r('4) Who / QUEM? + Quanto?', '5) How / COMO?', '6) How often / FREQUÊNCIA?');
+  r('4) Who / QUEM? + Quanto?','5) How / COMO?','6) How often / FREQUÊNCIA?');
   r(d.who, d.how, d.howoften);
   blank();
-  r('Problema Focado:', '', '');
-  rFull(d.foco);
+  r('Problema Focado:','','');
+  r(d.foco,'','');
   blank();
-
-  // Section 2
-  rFull('Sección 2 - Análisis de Ishikawa');
-  r('No.', 'Revisar', 'Si / No / N/A | Resultado / Comentários');
-  d.ishikawa.forEach(function(item) {
-    r(item.n + '. ' + item.title, '', (item.status || '—') + (item.obs ? ' | ' + item.obs : ''));
+  r('Sección 2 — Análisis de Ishikawa','','');
+  r('No.','Revisar','Si / No / N/A  |  Resultado / Comentários');
+  d.ishikawa.forEach(function(item){
+    r(item.n+'. '+item.title,'',(item.status||'—')+(item.obs?' | '+item.obs:''));
   });
   blank();
-
-  // Section 3
-  rFull('Sección 3 - 5 Porquês + Contramedidas');
-  r('Causa Imediata', 'Por quê? (1) | Por quê? (2)', 'Causa Raiz | Contramedida | Resp | Data');
-  d.whys.forEach(function(w) {
-    if (w.ci || w.w1 || w.cr) {
-      r(w.ci, (w.w1 || '—') + (w.w2 ? '\n' + w.w2 : ''), (w.cr || '—') + (w.cm ? '\nContramedida: ' + w.cm : '') + (w.resp ? '\nResp: ' + w.resp : '') + (w.dt ? '\nData: ' + w.dt : ''));
+  r('Sección 3 — 5 Porquês + Contramedidas','','');
+  r('Causa Imediata','Por quê? (1)  |  Por quê? (2)','Causa Raiz  |  Contramedida  |  Resp  |  Data');
+  d.whys.forEach(function(w){
+    if(w.ci||w.w1||w.cr){
+      r(w.ci,(w.w1||'—')+(w.w2?'\n'+w.w2:''),
+        (w.cr||'—')+(w.cm?'\nContramedida: '+w.cm:'')+(w.resp?'\nResp: '+w.resp:'')+(w.dt?'\nData: '+w.dt:''));
     }
   });
   blank();
-  r('Causa Raiz Identificada:', '', '');
-  rFull(d.causaRaiz);
+  r('Causa Raiz Identificada:','','');
+  r(d.causaRaiz,'','');
   blank();
+  r('Elabora: '+d.elabora,'Aprovação: '+d.aprova,'Data de Aprovação: '+d.dataAprov);
 
-  // Approval
-  r('Elabora: ' + d.elabora, 'Aprovação: ' + d.aprova, 'Fecha de Aprovação: ' + d.dataAprov);
+  var ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:48},{wch:48},{wch:58}];
+  var merges=[];
+  rows.forEach(function(row,i){if(row[1]===''&&row[2]===''&&row[0]!=='')merges.push({s:{r:i,c:0},e:{r:i,c:2}});});
+  ws['!merges']=merges;
 
-  // Build workbook
-  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'ACR');
 
-  // Column widths
-  ws['!cols'] = [{ wch: 45 }, { wch: 45 }, { wch: 55 }];
-
-  // Merge first column header-like cells (col A full width)
-  var merges = [];
-  rows.forEach(function(row, i) {
-    if (row[1] === '' && row[2] === '' && row[0] !== '') {
-      merges.push({ s: { r: i, c: 0 }, e: { r: i, c: 2 } });
-    }
-  });
-  ws['!merges'] = merges;
-
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'ACR');
-
-  var filename = 'ACR_' + (d.local.replace(/[^A-Z0-9]/gi, '') || 'EVENTO') + '_' + (d.data || new Date().toISOString().split('T')[0]).replace(/-/g,'') + '.xlsx';
-  lastGeneratedACRFilename = filename;
-
-  // Generate blob for email attach hint
-  var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  lastGeneratedACRBlob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-  // Download
-  XLSX.writeFile(wb, filename);
-
-  showACRStatus('success', '✅ Arquivo <strong>' + filename + '</strong> baixado com sucesso!');
+  var filename='ACR_'+(d.local.replace(/[^A-Z0-9]/gi,'')||'EVENTO')+'_'+(d.data||new Date().toISOString().split('T')[0]).replace(/-/g,'')+'.xlsx';
+  lastGeneratedACRFilename=filename;
+  XLSX.writeFile(wb,filename);
+  showACRStatus('success','✅ Arquivo <strong>'+filename+'</strong> baixado com sucesso!');
 }
 
-// sendACREmail removido — download direto pelo botão Baixar XLSX
-
-function showACRStatus(type, msg) {
-  var el = document.getElementById('acr-generate-status');
-  var colors = {
-    success: { bg: 'rgba(34,215,138,0.12)', border: 'var(--green)', color: 'var(--green)' },
-    error:   { bg: 'rgba(255,60,40,0.12)',  border: 'var(--red)',   color: 'var(--red)' },
-    warn:    { bg: 'rgba(255,184,0,0.12)',   border: 'var(--accent2)', color: 'var(--accent2)' },
-    info:    { bg: 'rgba(59,130,246,0.1)',   border: 'var(--blue)', color: '#7ab4ff' }
+function showACRStatus(type,msg){
+  var el=document.getElementById('acr-generate-status');
+  var colors={
+    success:{bg:'rgba(0,166,80,0.08)',border:'#00a650',color:'#00883f'},
+    error:  {bg:'rgba(229,57,53,0.08)',border:'#e53935',color:'#c62828'},
+    warn:   {bg:'rgba(255,98,0,0.08)', border:'#ff6200',color:'#e65100'}
   };
-  var c = colors[type] || colors.info;
-  el.style.display = 'block';
-  el.style.background = c.bg;
-  el.style.border = '1px solid ' + c.border;
-  el.style.color = c.color;
-  el.innerHTML = msg;
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  var cv=colors[type]||colors.success;
+  el.style.display='block';
+  el.style.background=cv.bg;
+  el.style.border='1px solid '+cv.border;
+  el.style.color=cv.color;
+  el.style.borderRadius='8px';
+  el.innerHTML=msg;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 </script>
 </body>
