@@ -13,7 +13,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .header-left{display:flex;align-items:center;gap:12px;}
 .logo-badge{background:#333333;color:#ffe600;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 9px;border-radius:4px;letter-spacing:1px;}
 .header-title{font-size:14px;font-weight:600;color:var(--text2);}
-.live-badge{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:#333333;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+.live-badge{display:flex;align-items:center;gap:6px;background:transparent;border:1.5px solid #333333;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#333333;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#333333;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 .tabs{display:flex;border-bottom:2px solid var(--border);background:var(--surface);padding:0 28px;overflow-x:auto;}
@@ -44,8 +44,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .remove-btn:hover{color:var(--red);}
 .add-action-btn{display:flex;align-items:center;gap:8px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--text2);font-size:13px;padding:9px 14px;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif;width:100%;}
 .add-action-btn:hover{border-color:var(--accent);color:var(--accent);}
-.section-label{font-size:11px;font-weight:700;color:#333333;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.section-label{font-size:10px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:#e8e8e8;}
 .btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
 .btn{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Sora',sans-serif;transition:all 0.18s;}
 .btn-primary{background:#ffe600;color:#333333;border:1px solid #e6cf00;font-weight:700;}.btn-primary:hover{background:#ffe033;}
@@ -151,6 +151,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <div class="field"><label>Equipamento / Esteira</label><input type="text" id="equipamento" placeholder="Ex: B080" oninput="syncFields()"></div>
     <div class="field"><label>Data</label><input type="date" id="data" oninput="syncFields()"></div>
     <div class="field"><label>Início do Impacto</label><input type="time" id="inicio" oninput="syncFields()"></div>
+    <div class="field"><label>Fim do Impacto</label><input type="time" id="fim" oninput="syncFields()"></div>
+    <div class="field"><label>Duração Total</label><input type="text" id="duracao-display" readonly placeholder="Preenchido automaticamente" style="background:var(--surface2);color:var(--blue);font-family:'JetBrains Mono',monospace;font-weight:700;cursor:default;"></div>
   </div>
   <div class="section-label">Impacto</div>
   <div class="form-grid full">
@@ -176,7 +178,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div class="form-grid">
     <div class="field"><label>Responsáveis</label><input type="text" id="focal" placeholder="Ex: Nicollas / Saul" oninput="syncFields()"></div>
     <div class="field"><label>Status Atual</label>
-      <select id="status" onchange="syncFields()">
+      <select id="status" onchange="onStatusChange()">
         <option value="Em andamento">🔴 Em andamento</option>
         <option value="Em análise">🟡 Em análise</option>
         <option value="Em teste">🔵 Em teste</option>
@@ -467,14 +469,24 @@ function buildReport(){
   var status=document.getElementById('status').value;
   var actions=getActions();
   var cdCode=local.split(' - ')[0]||local;
+  var fim=document.getElementById('fim').value||'';
   var dateF=data?new Date(data+'T12:00:00').toLocaleDateString('pt-BR'):'[DATA]';
-  var r='📢🚨 ATUALIZAÇÃO DE CRISE - '+cdCode+' 📢🚨\nOcorrência:\nLocal: '+local+'\nImpacto: '+impacto+'\nRelevância: '+rel+'\nData: '+dateF+'   Início do Impacto: '+inicio+'\n\nDescrição da Ocorrência:\n'+desc+'\n\n';
+  var durStr=fim&&inicio?calcTempo(inicio,fim):'';
+  var r='📢🚨 ATUALIZAÇÃO DE CRISE - '+cdCode+' 📢🚨\nOcorrência:\nLocal: '+local+'\nImpacto: '+impacto+'\nRelevância: '+rel+'\nData: '+dateF+'   Início do Impacto: '+inicio+(fim?'   Fim do Impacto: '+fim:'')+(durStr?'   Duração: '+durStr:'')+'\n\nDescrição da Ocorrência:\n'+desc+'\n\n';
   if(actions)r+='Ações Realizadas:\n'+actions+'\n\n';
   r+='Causa: '+causa+'\nFocal Point: '+focal+'\nStatus: '+status;
   return r;
 }
 
 function syncFields(){
+  // Calcula duração
+  var ini=document.getElementById('inicio').value;
+  var fim=document.getElementById('fim').value;
+  var durEl=document.getElementById('duracao-display');
+  if(durEl){
+    if(ini&&fim){ var d=calcTempo(ini,fim); durEl.value=d||''; }
+    else { durEl.value=''; }
+  }
   document.getElementById('preview-report').textContent=buildReport();
   updateEventLabels();
 }
@@ -486,6 +498,25 @@ function updateEventLabels(){
   ['flash-evento-label','acr-evento-label'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=label;});
 }
 
+
+function onStatusChange(){
+  var st=document.getElementById('status').value;
+  if(st==='Resolvido'){
+    // Para o timer
+    if(timerRunning){
+      clearInterval(timerInterval);timerRunning=false;
+      document.getElementById('timer-start-btn').textContent='▶ Retomar';
+      document.getElementById('timer-start-btn').classList.remove('active');
+    }
+    // Preenche Fim do Impacto com hora atual se vazio
+    var fimEl=document.getElementById('fim');
+    if(fimEl&&!fimEl.value){
+      var now=new Date();
+      fimEl.value=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    }
+  }
+  syncFields();
+}
 function syncFlashFromReport(){
   var inicio=document.getElementById('inicio').value;
   if(inicio)document.getElementById('flash-inicio')&&(document.getElementById('flash-inicio').value=inicio);
@@ -670,9 +701,13 @@ function syncAcrFromReport(){
   fill('acr-what', impacto+(causa?'\nCausa inicial: '+causa:''));
   fill('acr-where', (equip?'Equipamento: '+equip+'\n':'')+(local?'Local: '+local:''));
 
+  var fimVal=document.getElementById('fim')?document.getElementById('fim').value||'':'';
+  var durVal=document.getElementById('duracao-display')?document.getElementById('duracao-display').value||'':'';
   var whenVal='';
   if(data){var p=data.split('-');whenVal+='Data: '+p[2]+'/'+p[1]+'/'+p[0];}
   if(inicio){whenVal+=(whenVal?'\n':'')+'Início: '+inicio;}
+  if(fimVal){whenVal+='  |  Fim: '+fimVal;}
+  if(durVal){whenVal+='\nDuração total: '+durVal;}
   fill('acr-when', whenVal);
 
   var ws=document.getElementById('acr-when-tipo');
@@ -741,6 +776,7 @@ function collectACRData(){
     who:document.getElementById('acr-who').value||'',
     how:document.getElementById('acr-how').value||'',
     howoften:document.getElementById('acr-howoften').value||'',
+    howmuch:document.getElementById('acr-howmuch')?document.getElementById('acr-howmuch').value||'':'',
     foco:document.getElementById('acr-foco').value||'',
     ishikawa:ishikawaRows, whys:whys,
     causaRaiz:document.getElementById('acr-causa-raiz').value||'',
@@ -773,6 +809,9 @@ function generateACRXLSX(){
   blank();
   r('4) Who / QUEM? + Quanto?','5) How / COMO?','6) How often / FREQUÊNCIA?');
   r(d.who, d.how, d.howoften);
+  blank();
+  r('7) How Much / IMPACTO FINANCEIRO?','','');
+  r(d.howmuch||'Não informado','','');
   blank();
   r('Problema Focado:','','');
   r(d.foco,'','');
