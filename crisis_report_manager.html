@@ -303,9 +303,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 
   <div class="section-label" style="margin-top:20px">Exportar ACR</div>
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;">
-    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Gere e baixe o arquivo Excel (.xlsx) com todos os dados da ACR preenchida acima.</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gera uma cópia do template ACR no Google Drive já preenchida com os dados acima, salva automaticamente na pasta do mês correto.</p>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="generateACRXLSX()" style="font-size:14px;padding:12px 28px;">📥 Baixar XLSX da ACR</button>
+      <button class="btn btn-primary" onclick="generateACRGoogleSheets()" style="font-size:14px;padding:12px 28px;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/><rect x="6" y="7" width="12" height="1.5" rx="0.75" fill="white"/><rect x="6" y="10.5" width="12" height="1.5" rx="0.75" fill="white"/><rect x="6" y="14" width="8" height="1.5" rx="0.75" fill="white"/></svg>
+        Gerar ACR no Google Sheets
+      </button>
     </div>
     <div id="acr-generate-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;"></div>
   </div>
@@ -344,7 +347,20 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 
 <script>
 var relevancia='',actionCount=0,whyCount=0,timerInterval=null,timerSeconds=0,countdownSeconds=1500,timerRunning=false;
-var savedReports=JSON.parse(localStorage.getItem('meli_crisis_v2')||'[]');
+var savedReports=[];
+
+// Carrega histórico do GRID state (ou usa array vazio se não disponível)
+async function loadGridState(){
+  try{
+    if(window.GRID&&window.GRID.state){
+      var result=await window.GRID.state.get();
+      var state=result&&result.state||{};
+      savedReports=state.savedReports||[];
+      renderLog();
+    }
+  }catch(e){ console.log('GRID state não disponível, usando memória local'); }
+}
+loadGridState();
 var ISHIKAWA=[
   {n:'1',t:'Limpeza',d:'Área livre de contaminação/poeira? Padrão de limpeza seguido?'},
   {n:'2',t:'Inspeção',d:'Área livre de defeitos? (deformações, peças soltas, mal posicionadas)'},
@@ -638,14 +654,20 @@ function copyEl(btnId,spanId){
   });
 }
 
-function saveReport(e){
+async function saveReport(e){
   var report=buildReport();
   var flashText=[document.getElementById('pf-impacto').textContent,document.getElementById('pf-acoes').textContent,document.getElementById('pf-proximos').textContent].join('\n\n');
   var acrText=document.getElementById('preview-acr-text').textContent;
   var local=document.getElementById('local').value||'Sem local',equip=document.getElementById('equipamento').value||'';
   var status=document.getElementById('status').value,rel=relevancia||'N/A',createdAt=new Date().toLocaleString('pt-BR');
   savedReports.unshift({id:Date.now(),local,equip,status,rel,report,flashText,acrText,createdAt});
-  localStorage.setItem('meli_crisis_v2',JSON.stringify(savedReports));
+  // Salva no GRID state (persiste entre sessões)
+  try{
+    if(window.GRID&&window.GRID.state){
+      var current=await window.GRID.state.get().catch(function(){return{state:{},updated_at:null};});
+      var updated=await window.GRID.state.set({...(current.state||{}),savedReports:savedReports},{updated_at:current.updated_at});
+    }
+  }catch(e){ console.log('GRID state save error:', e); }
   var btn=e.target,orig=btn.textContent;btn.textContent='✅ Salvo!';setTimeout(function(){btn.textContent=orig;},2000);
 }
 
@@ -884,6 +906,96 @@ function generateACRXLSX(){
   }, 100);
 }
 
+
+// ===== GERAR ACR NO GOOGLE SHEETS =====
+var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/mercadolivre.com/s/AKfycbwkJrVHABBFj6szON87nKuQx4xKoV0bUHF5p7jPFg8hVQf985CsyHiUAW4a1TDfqEHJ/exec';
+
+function generateACRGoogleSheets(){
+  var d = collectACRData();
+
+  if(!d.local && !d.falla){
+    showACRStatus('warn','⚠️ Preencha ao menos o Local e o Impacto no Report antes de gerar a ACR.');
+    return;
+  }
+
+  if(!APPS_SCRIPT_URL){
+    showACRStatus('warn','⚠️ URL do Apps Script não configurada.');
+    return;
+  }
+
+  showACRStatus('info','⏳ Criando arquivo no Google Drive...');
+
+  var payload = {
+    local: d.local, equip: d.equip, data: d.data,
+    inicio: d.inicio, fim: d.fim, dur: d.dur,
+    falla: d.falla, what: d.what, where: d.where,
+    when: d.when, who: d.who, how: d.how,
+    howoften: d.howoften, howmuch: d.howmuch,
+    foco: d.foco, ishikawa: d.ishikawa, whys: d.whys,
+    causaRaiz: d.causaRaiz, elabora: d.elabora,
+    aprova: d.aprova, focal: document.getElementById('focal').value||''
+  };
+
+  // Tentar fetch POST primeiro (funciona fora do GRID e em alguns sandboxes)
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(res && res.success){
+      showACRStatus('success',
+        '✅ ACR criada no Google Drive! ' +
+        '<a href="'+res.url+'" target="_blank" style="color:inherit;font-weight:700;text-decoration:underline;">📂 Abrir no Google Sheets</a>'
+      );
+    } else {
+      showACRStatus('error','❌ Erro: ' + (res && res.error ? res.error : 'desconhecido'));
+    }
+  })
+  .catch(function(){
+    // Fallback: JSONP (funciona no browser local)
+    var callbackName = 'acrCallback_' + Date.now();
+    var timeout = setTimeout(function(){
+      if(window[callbackName]){
+        delete window[callbackName];
+        var script = document.getElementById('jsonp-acr-script');
+        if(script) script.remove();
+        showACRStatus('error','❌ Tempo esgotado. Tente abrir o site fora do GRID.');
+      }
+    }, 30000);
+
+    window[callbackName] = function(res){
+      clearTimeout(timeout);
+      delete window[callbackName];
+      var script = document.getElementById('jsonp-acr-script');
+      if(script) script.remove();
+      if(res && res.success){
+        showACRStatus('success',
+          '✅ ACR criada no Google Drive! ' +
+          '<a href="'+res.url+'" target="_blank" style="color:inherit;font-weight:700;text-decoration:underline;">📂 Abrir no Google Sheets</a>'
+        );
+      } else {
+        showACRStatus('error','❌ Erro: ' + (res && res.error ? res.error : 'desconhecido'));
+      }
+    };
+
+    var script = document.createElement('script');
+    script.id = 'jsonp-acr-script';
+    script.src = APPS_SCRIPT_URL +
+      '?callback=' + callbackName +
+      '&data=' + encodeURIComponent(JSON.stringify(payload));
+    document.head.appendChild(script);
+
+    script.onerror = function(){
+      clearTimeout(timeout);
+      delete window[callbackName];
+      script.remove();
+      showACRStatus('error','❌ Erro de conexão. Tente abrir o site fora do GRID.');
+    };
+  });
+}
 function showACRStatus(type,msg){
   var el=document.getElementById('acr-generate-status');
   if(!el)return;
